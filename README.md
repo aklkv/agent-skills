@@ -53,10 +53,6 @@ Skills are automatically available once installed. The agent will use them when 
 **Examples:**
 
 ```
-Deploy my app
-```
-
-```
 Review this Ember component for performance issues
 ```
 
