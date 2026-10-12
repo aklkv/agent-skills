@@ -563,7 +563,7 @@
     "ruleId": "",
     "ruleTitle": "Prefer Named Exports, Fallback to Default for Implicit Template Lookup",
     "type": "good",
-    "code": "// app/helpers/format-date.js\nimport { helper } from '@ember/component/helper';\n\nexport const formatDate = helper(([value]) => {\n  return new Date(value).toLocaleDateString();\n});\n\nexport default formatDate;",
+    "code": "// app/helpers/format-date.js\nexport function formatDate(value) {\n  return new Date(value).toLocaleDateString();\n}\n\nexport default formatDate;",
     "language": "javascript",
     "description": "hybrid `.gjs`/`.hbs` named export + default alias"
   },

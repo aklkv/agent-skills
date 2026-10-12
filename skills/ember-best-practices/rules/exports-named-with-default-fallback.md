@@ -31,11 +31,9 @@ export function formatDate(date) {
 
 ```javascript
 // app/helpers/format-date.js
-import { helper } from '@ember/component/helper';
-
-export const formatDate = helper(([value]) => {
+export function formatDate(value) {
   return new Date(value).toLocaleDateString();
-});
+}
 
 export default formatDate;
 ```
