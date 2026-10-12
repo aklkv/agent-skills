@@ -221,12 +221,7 @@ export async function parseRuleFile(filePath: string): Promise<RuleFile> {
 
       const refMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/g);
       if (refMatch) {
-        references.push(
-          ...refMatch.map((ref) => {
-            const m = ref.match(/\[([^\]]+)\]\(([^)]+)\)/);
-            return m ? m[2] : ref;
-          }),
-        );
+        references.push(...refMatch);
       }
       continue;
     }

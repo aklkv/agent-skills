@@ -35,7 +35,7 @@ export interface Rule {
   impactDescription?: string; // e.g., "2-10× improvement"
   explanation: string;
   examples: CodeExample[];
-  references?: string[]; // URLs or citations
+  references?: string[]; // Markdown links or URLs
   tags?: string[]; // For categorization/search
 }
 

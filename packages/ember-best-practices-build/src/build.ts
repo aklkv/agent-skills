@@ -109,7 +109,10 @@ function generateMarkdown(
       });
 
       if (rule.references && rule.references.length > 0) {
-        md += `Reference: ${rule.references.map((ref) => `[${ref}](${ref})`).join(', ')}\n\n`;
+        // Markdown links from the rule's Reference line; bare URLs from its frontmatter
+        md += `Reference: ${rule.references
+          .map((ref) => (ref.startsWith('[') ? ref : `[${ref}](${ref})`))
+          .join(', ')}\n\n`;
       }
     });
 
