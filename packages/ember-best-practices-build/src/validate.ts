@@ -120,6 +120,14 @@ function validateRuleSource(source: RuleSourceMetadata, file: string): Validatio
     });
   }
 
+  if (!/\]\(https?:\/\//.test(source.body.replace(/^```[\s\S]*?^```/gm, ''))) {
+    errors.push({
+      file,
+      message:
+        'Missing a link to the documentation the rule is based on ("Reference: [...](https://...)")',
+    });
+  }
+
   return errors;
 }
 

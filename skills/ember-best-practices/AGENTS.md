@@ -389,6 +389,8 @@ export default class DashboardRoute extends Route {
 
 Using `hash()` from RSVP allows Ember to resolve all promises concurrently, significantly reducing load time.
 
+Reference: [https://guides.emberjs.com/release/routing/specifying-a-routes-model/](https://guides.emberjs.com/release/routing/specifying-a-routes-model/), [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+
 ### 1.3 Use Loading Substates for Better UX
 
 **Impact: CRITICAL (Perceived performance improvement)**
@@ -431,6 +433,8 @@ export default class PostsRoute extends Route {
 ```
 
 Ember automatically renders `{route-name}-loading` route templates while the model promise resolves, providing better UX without extra code.
+
+Reference: [https://guides.emberjs.com/release/routing/loading-and-error-substates/](https://guides.emberjs.com/release/routing/loading-and-error-substates/)
 
 ### 1.4 Use Route-Based Code Splitting
 
@@ -647,6 +651,8 @@ class My extends Component {
 
 Direct imports and using built-in Ember utilities reduce bundle size by avoiding unused code.
 
+Reference: [https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking), [https://github.com/embroider-build/embroider](https://github.com/embroider-build/embroider)
+
 ### 2.2 Lazy Load Heavy Dependencies
 
 **Impact: CRITICAL (30-50% initial bundle reduction)**
@@ -713,6 +719,8 @@ class Dashboard extends Component {
 **Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/promise` to handle slow networks and errors properly.
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
+
+Reference: [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import), [https://reactive.nullvoxpopuli.com/](https://reactive.nullvoxpopuli.com/)
 
 ### 2.3 Use Embroider Build Pipeline
 
@@ -1523,6 +1531,8 @@ class Form extends Component {
 ```
 
 Only track properties that directly affect the template or other tracked getters to minimize unnecessary re-renders.
+
+Reference: [https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 3.5 Build Reactive Chains with Dependent Getters
 
@@ -4618,6 +4628,8 @@ export default class DataService extends Service {
 
 Caching in services prevents duplicate API requests and improves performance significantly.
 
+Reference: [https://guides.emberjs.com/release/services/](https://guides.emberjs.com/release/services/)
+
 ### 5.2 Implement Robust Data Requesting Patterns
 
 **Impact: HIGH (Prevents request waterfalls and race conditions in data flows)**
@@ -5745,6 +5757,8 @@ export class Stats extends Component {
 **Note on @cached**: Use `@cached` when a getter is accessed multiple times (like in `{{#each}}` loops or by other getters). For getters accessed only once, regular getters are sufficient and avoid unnecessary memoization overhead.
 
 Moving computations to getters ensures they run only when dependencies change, not on every render. Templates remain clean and readable.
+
+Reference: [https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/cached](https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/cached), [https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 6.2 Compose Helpers for Reusable Logic
 
@@ -6907,6 +6921,8 @@ Use `{{#let}}` to compute expensive values once and reuse them in the template i
 ```
 
 `{{#let}}` computes values once and caches them for the block scope, reducing redundant calculations.
+
+Reference: [https://api.emberjs.com/ember/release/classes/Ember.Templates.helpers/methods/let](https://api.emberjs.com/ember/release/classes/Ember.Templates.helpers/methods/let)
 
 ### 6.9 Use {{fn}} for Partial Application Only
 

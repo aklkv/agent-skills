@@ -92,3 +92,5 @@ export class Stats extends Component {
 **Note on @cached**: Use `@cached` when a getter is accessed multiple times (like in `{{#each}}` loops or by other getters). For getters accessed only once, regular getters are sufficient and avoid unnecessary memoization overhead.
 
 Moving computations to getters ensures they run only when dependencies change, not on every render. Templates remain clean and readable.
+
+Reference: [Ember API: @cached](https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/cached), [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)

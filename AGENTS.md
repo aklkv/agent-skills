@@ -13,7 +13,7 @@ Each rule is a file in `skills/ember-best-practices/references/`. Its filename p
 `skills/ember-best-practices/AGENTS.md` is generated from the rules, so don't edit it by hand:
 
 ```bash
-pnpm validate # checks the rule files against the template, and that SKILL.md links each one
+pnpm validate # checks the rule files against the template, that SKILL.md links each one, and that each links its documentation
 pnpm build    # regenerates AGENTS.md
 ```
 

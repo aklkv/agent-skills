@@ -136,7 +136,7 @@ Each rule file contains:
 - Brief explanation of why it matters
 - Incorrect code example with explanation
 - Correct code example with explanation
-- Additional context and references
+- Links to the official documentation it is based on
 
 ## Accessibility with OSS Tools
 
