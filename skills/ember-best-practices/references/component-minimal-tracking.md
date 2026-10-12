@@ -55,3 +55,5 @@ class Form extends Component {
 ```
 
 Only track properties that directly affect the template or other tracked getters to minimize unnecessary re-renders.
+
+Reference: [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)

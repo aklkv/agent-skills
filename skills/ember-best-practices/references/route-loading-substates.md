@@ -45,3 +45,5 @@ export default class PostsRoute extends Route {
 ```
 
 Ember automatically renders `{route-name}-loading` route templates while the model promise resolves, providing better UX without extra code.
+
+Reference: [Ember Guides: Loading and Error Substates](https://guides.emberjs.com/release/routing/loading-and-error-substates/)

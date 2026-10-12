@@ -96,3 +96,5 @@ export default class DataService extends Service {
 ```
 
 Caching in services prevents duplicate API requests and improves performance significantly.
+
+Reference: [Ember Guides: Services](https://guides.emberjs.com/release/services/)

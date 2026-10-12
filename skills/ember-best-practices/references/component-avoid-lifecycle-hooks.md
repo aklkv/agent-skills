@@ -315,8 +315,4 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
-Reference:
-
-- [Ember Modifiers](https://github.com/ember-modifier/ember-modifier)
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
-- [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)

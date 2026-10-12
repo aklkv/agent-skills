@@ -191,7 +191,7 @@ class FormActions extends Component {
 - ❌ Route model hooks (return promises directly)
 - ❌ Simple async without user concurrency concerns (use async/await)
 
-See **advanced-data-loading-with-ember-concurrency.md** for correct data loading patterns.
+See [advanced-data-loading-with-ember-concurrency](advanced-data-loading-with-ember-concurrency.md) for correct data loading patterns.
 
 ember-concurrency provides automatic cancelation, derived state (isRunning, isIdle), and better patterns for **user-initiated** async operations.
 

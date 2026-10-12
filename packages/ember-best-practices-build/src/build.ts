@@ -4,7 +4,7 @@
  */
 
 import { readdir, readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { join, relative } from 'path';
 import { Rule, Section, GuidelinesDocument, ImpactLevel } from './types.js';
 import { parseRuleFile, RuleFile } from './parser.js';
 import { RULES_DIR, METADATA_FILE, OUTPUT_FILE, SKILL_DIR } from './config.js';
@@ -109,7 +109,10 @@ function generateMarkdown(
       });
 
       if (rule.references && rule.references.length > 0) {
-        md += `Reference: ${rule.references.map((ref) => `[${ref}](${ref})`).join(', ')}\n\n`;
+        // Markdown links from the rule's Reference line; bare URLs from its frontmatter
+        md += `Reference: ${rule.references
+          .map((ref) => (ref.startsWith('[') ? ref : `[${ref}](${ref})`))
+          .join(', ')}\n\n`;
       }
     });
 
@@ -260,8 +263,20 @@ async function build() {
       console.log(`✓ Updated SKILL.md`);
     }
 
-    // Generate markdown
-    const markdown = generateMarkdown(sections, metadata);
+    // Generate markdown. Rules link each other by filename; AGENTS.md sits
+    // in the skill root, so point those links, outside code blocks, into the
+    // rules directory.
+    const markdown = generateMarkdown(sections, metadata)
+      .split(/(^```[\s\S]*?^```)/m)
+      .map((part, i) =>
+        i % 2
+          ? part
+          : part.replace(
+              /\]\((?![a-z]+:|#|\/)([^)\s]+\.md(?:#[^)\s]*)?)\)/gi,
+              `](${relative(SKILL_DIR, RULES_DIR)}/$1)`,
+            ),
+      )
+      .join('');
 
     // Write output
     await writeFile(OUTPUT_FILE, markdown, 'utf-8');
