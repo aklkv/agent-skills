@@ -251,12 +251,11 @@ export class AnalyticsTracker extends Component {
 ```javascript
 // app/components/shopping-cart/service.js
 import Service from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { action } from '@ember/object';
 
 export class CartService extends Service {
-  @tracked items = new TrackedArray([]);
+  items = trackedArray([]);
 
   get total() {
     return this.items.reduce((sum, item) => sum + item.price, 0);
@@ -318,13 +317,12 @@ class ShoppingCart extends Component {
 
 ```javascript
 // app/utils/notification-manager.js
-import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { setOwner } from '@ember/application';
 
 export class NotificationManager {
-  @tracked notifications = new TrackedArray([]);
+  notifications = trackedArray([]);
 
   constructor(owner) {
     setOwner(this, owner);

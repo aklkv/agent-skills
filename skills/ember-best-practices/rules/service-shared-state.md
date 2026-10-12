@@ -82,14 +82,14 @@ Services provide centralized state management with automatic reactivity through 
 // app/services/cart.js
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { cached } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class CartService extends Service {
   @service store;
 
-  items = new TrackedArray([]);
+  items = trackedArray([]);
 
   @cached
   get total() {

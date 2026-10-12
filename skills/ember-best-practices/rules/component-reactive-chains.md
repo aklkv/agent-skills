@@ -59,12 +59,11 @@ class ShoppingCart extends Component {
 ```glimmer-js
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 
 class ShoppingCart extends Component {
-  @tracked items = new TrackedArray([]);
+  items = trackedArray([]);
 
   // Base calculation
   get subtotal() {

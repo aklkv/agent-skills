@@ -33,13 +33,13 @@ export default class UserService extends Service {
 import Service from '@ember/service';
 import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { TrackedMap } from 'tracked-built-ins';
+import { trackedMap } from '@ember/reactive/collections';
 
 export default class UserService extends Service {
   @service store;
 
   @tracked currentUser = null;
-  cache = new TrackedMap();
+  cache = trackedMap();
 
   async getCurrentUser() {
     if (!this.currentUser) {

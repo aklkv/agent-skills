@@ -185,12 +185,12 @@ export default class PostRoute extends Route {
 // app/services/post-cache.js
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import { TrackedMap } from 'tracked-built-ins';
+import { trackedMap } from '@ember/reactive/collections';
 
 export default class PostCacheService extends Service {
   @service store;
 
-  cache = new TrackedMap();
+  cache = trackedMap();
   cacheTimes = new Map();
   cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
@@ -1580,12 +1580,11 @@ class ShoppingCart extends Component {
 ```glimmer-js
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 
 class ShoppingCart extends Component {
-  @tracked items = new TrackedArray([]);
+  items = trackedArray([]);
 
   // Base calculation
   get subtotal() {
@@ -2689,12 +2688,11 @@ In most apps, you'll have very few tracked fields because most data comes from a
 ```glimmer-js
 // app/components/form-container.gjs
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { TrackedObject } from 'tracked-built-ins';
+import { trackedObject } from '@ember/reactive/collections';
 
 class FormContainer extends Component {
   // Compose form state
-  @tracked formData = new TrackedObject({
+  formData = trackedObject({
     firstName: '',
     lastName: '',
     email: '',
@@ -2705,10 +2703,10 @@ class FormContainer extends Component {
   });
 
   // Compose validation state
-  @tracked errors = new TrackedObject({});
+  errors = trackedObject({});
 
   // Compose UI state
-  @tracked ui = new TrackedObject({
+  ui = trackedObject({
     isSubmitting: false,
     isDirty: false,
     showErrors: false,
@@ -2830,11 +2828,10 @@ class PaginatedList extends Component {
 
 ```javascript
 // app/utils/selection-state.js
-import { tracked } from '@glimmer/tracking';
-import { TrackedSet } from 'tracked-built-ins';
+import { trackedSet } from '@ember/reactive/collections';
 
 export class SelectionState {
-  @tracked selectedIds = new TrackedSet();
+  selectedIds = trackedSet();
 
   get count() {
     return this.selectedIds.size;
@@ -4554,13 +4551,13 @@ export default class UserService extends Service {
 import Service from '@ember/service';
 import { service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { TrackedMap } from 'tracked-built-ins';
+import { trackedMap } from '@ember/reactive/collections';
 
 export default class UserService extends Service {
   @service store;
 
   @tracked currentUser = null;
-  cache = new TrackedMap();
+  cache = trackedMap();
 
   async getCurrentUser() {
     if (!this.currentUser) {
@@ -5192,12 +5189,11 @@ export class AnalyticsTracker extends Component {
 ```javascript
 // app/components/shopping-cart/service.js
 import Service from '@ember/service';
-import { tracked } from '@glimmer/tracking';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { action } from '@ember/object';
 
 export class CartService extends Service {
-  @tracked items = new TrackedArray([]);
+  items = trackedArray([]);
 
   get total() {
     return this.items.reduce((sum, item) => sum + item.price, 0);
@@ -5259,13 +5255,12 @@ class ShoppingCart extends Component {
 
 ```javascript
 // app/utils/notification-manager.js
-import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { setOwner } from '@ember/application';
 
 export class NotificationManager {
-  @tracked notifications = new TrackedArray([]);
+  notifications = trackedArray([]);
 
   constructor(owner) {
     setOwner(this, owner);
@@ -5609,14 +5604,14 @@ Services provide centralized state management with automatic reactivity through 
 // app/services/cart.js
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 import { cached } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
 export default class CartService extends Service {
   @service store;
 
-  items = new TrackedArray([]);
+  items = trackedArray([]);
 
   @cached
   get total() {
