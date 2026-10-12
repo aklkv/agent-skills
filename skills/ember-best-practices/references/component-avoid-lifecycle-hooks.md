@@ -304,9 +304,9 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 - **Derived Data**: Use getters and `@cached` for reactive computations
 - **DOM Side Effects**: Use custom modifiers with `registerDestructor`
-- **Async Data Loading**: Use getPromiseState from warp-drive/reactiveweb
+- **Async Data Loading**: Use getPromiseState from WarpDrive (`@warp-drive/ember`)
 - **Better Code**: More testable, composable, and maintainable
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
-Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)

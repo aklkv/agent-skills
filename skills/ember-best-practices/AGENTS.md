@@ -675,7 +675,7 @@ class Dashboard extends Component {
 
 ```glimmer-js
 import Component from '@glimmer/component';
-import { getPromiseState } from 'reactiveweb/promise';
+import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 class Dashboard extends Component {
   // Use getPromiseState to model promise state for error/loading handling
@@ -691,11 +691,11 @@ class Dashboard extends Component {
 
   loadChart = () => {
     // Triggers lazy load, handles loading/error states automatically
-    return this.chartLoader.value;
+    return this.chartLoader.resolved;
   };
 
   highlightCode = (code) => {
-    const hljs = this.highlighterLoader.value;
+    const hljs = this.highlighterLoader.resolved;
     if (hljs) {
       return hljs.highlightAuto(code);
     }
@@ -705,16 +705,16 @@ class Dashboard extends Component {
   <template>
     {{#if this.chartLoader.isLoading}}
       <p>Loading chart library...</p>
-    {{else if this.chartLoader.isError}}
+    {{else if this.chartLoader.error}}
       <p>Error loading chart: {{this.chartLoader.error.message}}</p>
-    {{else if this.chartLoader.isResolved}}
+    {{else}}
       <canvas {{on "click" this.loadChart}}></canvas>
     {{/if}}
   </template>
 }
 ```
 
-**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/promise` to handle slow networks and errors properly.
+**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/get-promise-state` to handle slow networks and errors properly.
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
 
@@ -961,7 +961,7 @@ Very rarely, you might need a constructor for truly exceptional cases. Even then
 
 **Strongly discourage constructors** - they add complexity and infinite render loop risks. Use declarative class fields and getPromiseState instead.
 
-Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [WarpDrive: getRequestState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getRequestState)
 
 ### 3.2 Avoid CSS Classes in Learning Examples
 
@@ -1457,13 +1457,13 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 - **DOM Side Effects**: Use custom modifiers with `registerDestructor`
 
-- **Async Data Loading**: Use getPromiseState from warp-drive/reactiveweb
+- **Async Data Loading**: Use getPromiseState from WarpDrive (`@warp-drive/ember`)
 
 - **Better Code**: More testable, composable, and maintainable
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
-Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 3.4 Avoid Unnecessary Tracking
 
@@ -2623,7 +2623,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class DataManager extends Component {
   // Service injection as class fields
@@ -2644,9 +2644,9 @@ class DataManager extends Component {
   }
 
   <template>
-    {{#if this.currentUser.isFulfilled}}
+    {{#if this.currentUser.isSuccess}}
       <div>{{this.currentUser.value.name}}</div>
-    {{else if this.currentUser.isRejected}}
+    {{else if this.currentUser.isError}}
       <div>Error: {{this.currentUser.error.message}}</div>
     {{/if}}
   </template>
@@ -9786,13 +9786,13 @@ class UserProfile extends Component {
 
 - Can trigger multiple re-renders
 
-**Correct: use getPromiseState from warp-drive/reactiveweb for data loading**
+**Correct: use getPromiseState from WarpDrive for data loading**
 
 ```glimmer-js
 // app/components/user-profile.gjs
 import Component from '@glimmer/component';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class UserProfile extends Component {
   @cached
@@ -9804,9 +9804,9 @@ class UserProfile extends Component {
   <template>
     {{#if this.userData.isPending}}
       <div>Loading...</div>
-    {{else if this.userData.isRejected}}
+    {{else if this.userData.isError}}
       <div>Error: {{this.userData.error.message}}</div>
-    {{else if this.userData.isFulfilled}}
+    {{else if this.userData.isSuccess}}
       <h1>{{this.userData.value.name}}</h1>
     {{/if}}
   </template>
@@ -9927,7 +9927,7 @@ class FormSubmit extends Component {
 
 - **User-initiated only** - ember-concurrency is for handling user concurrency patterns
 
-- **Data loading** - Use `getPromiseState` from warp-drive/reactiveweb for non-user-initiated loading
+- **Data loading** - Use `getPromiseState` from WarpDrive (`@warp-drive/ember`) for non-user-initiated loading
 
 - **Avoid side effects** - Don't modify component state inside tasks that's read during render
 
@@ -9980,13 +9980,13 @@ class Better extends Component {
     return getPromiseState(fetch('/api/data').then((r) => r.json()));
   }
 
-  // template reads: {{#if this.data.isFulfilled}}{{this.data.value}}{{/if}}
+  // template reads: {{#if this.data.isSuccess}}{{this.data.value}}{{/if}}
 }
 ```
 
 ember-concurrency is a powerful tool for **user concurrency patterns**. For data loading, use `getPromiseState` instead.
 
-Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState)
 
 ### 10.2 Use Ember Concurrency for User Input Concurrency
 
