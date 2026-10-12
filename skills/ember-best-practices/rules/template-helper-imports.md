@@ -39,13 +39,10 @@ import { pluralize } from 'ember-inflector';
 </template>
 ```
 
-**Built-in and library helpers:**
+**Built-in helpers:** since Ember 7.1, `fn`, `hash`, `on`, `eq` and `not` are keywords in strict-mode templates, so they need no import. On older versions, import `fn` and `hash` from `@ember/helper`, `on` from `@ember/modifier`, and `eq` and `not` from `ember-truth-helpers`.
 
 ```glimmer-js
 // app/components/conditional-content.gjs
-import { fn, hash } from '@ember/helper'; // Actually built-in to Ember
-import { eq, not } from 'ember-truth-helpers'; // From ember-truth-helpers addon
-
 <template>
   <div class="content">
     {{#if (eq @status "active")}}
@@ -88,7 +85,6 @@ import { formatCurrency } from '../utils/format-currency';
 
 ```glimmer-ts
 // app/components/typed-component.gts
-import { fn } from '@ember/helper';
 import type { TOC } from '@ember/component/template-only';
 
 interface Signature {

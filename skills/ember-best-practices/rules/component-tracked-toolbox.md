@@ -1,13 +1,13 @@
 ---
-title: Use Tracked Toolbox for Complex State
+title: Use Tracked Collections for Complex State
 impact: HIGH
 impactDescription: Cleaner state management
 tags: components, tracked, state-management, performance
 ---
 
-## Use Tracked Toolbox for Complex State
+## Use Tracked Collections for Complex State
 
-For complex state patterns like maps, sets, and arrays that need fine-grained reactivity, use tracked-toolbox utilities instead of marking entire structures as @tracked.
+For complex state patterns like maps, sets, and arrays that need fine-grained reactivity, use the tracked collections from `@ember/reactive/collections` instead of marking entire structures as @tracked. They're built into Ember since 6.8; on older versions, use the `tracked-built-ins` addon.
 
 **Incorrect (tracking entire structures):**
 
@@ -30,14 +30,14 @@ class TodoList extends Component {
 }
 ```
 
-**Correct (using tracked-toolbox):**
+**Correct (using tracked collections):**
 
 ```javascript
 import Component from '@glimmer/component';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 
 class TodoList extends Component {
-  items = new TrackedArray([]);
+  items = trackedArray([]);
 
   // Use arrow functions for methods used in templates (no @action needed)
   addItem = (item) => {
@@ -55,14 +55,14 @@ class TodoList extends Component {
 **Also useful for Maps and Sets:**
 
 ```javascript
-import { TrackedMap, TrackedSet } from 'tracked-built-ins';
+import { trackedMap, trackedSet } from '@ember/reactive/collections';
 
 class Cache extends Component {
-  cache = new TrackedMap(); // Fine-grained reactivity per key
-  selected = new TrackedSet(); // Fine-grained reactivity per item
+  cache = trackedMap(); // Fine-grained reactivity per key
+  selected = trackedSet(); // Fine-grained reactivity per item
 }
 ```
 
-tracked-built-ins provides fine-grained reactivity and better performance than replacing entire structures.
+Tracked collections provide fine-grained reactivity and better performance than replacing entire structures.
 
-Reference: [tracked-built-ins](https://github.com/tracked-tools/tracked-built-ins)
+Reference: [RFC #1068: Tracked Collections](https://rfcs.emberjs.com/id/1068-tracked-collections/)
