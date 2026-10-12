@@ -60,3 +60,5 @@ class My extends Component {
 ```
 
 Direct imports and using built-in Ember utilities reduce bundle size by avoiding unused code.
+
+Reference: [MDN: Tree shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking), [Embroider](https://github.com/embroider-build/embroider)

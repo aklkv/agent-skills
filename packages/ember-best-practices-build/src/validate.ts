@@ -3,9 +3,10 @@
  * Validate rule files follow the correct structure
  */
 
-import { readdir } from 'fs/promises';
-import { join } from 'path';
-import { RULES_DIR } from './config.js';
+import { existsSync } from 'fs';
+import { readdir, readFile } from 'fs/promises';
+import { dirname, join, relative } from 'path';
+import { RULES_DIR, SKILL_DIR } from './config.js';
 import { parseRuleFile } from './parser.js';
 import { Rule, RuleSourceMetadata } from './types.js';
 
@@ -119,6 +120,14 @@ function validateRuleSource(source: RuleSourceMetadata, file: string): Validatio
     });
   }
 
+  if (!/\]\(https?:\/\//.test(source.body.replace(/^```[\s\S]*?^```/gm, ''))) {
+    errors.push({
+      file,
+      message:
+        'Missing a link to the documentation the rule is based on ("Reference: [...](https://...)")',
+    });
+  }
+
   return errors;
 }
 
@@ -186,6 +195,55 @@ function validateRule(rule: Rule, file: string): ValidationError[] {
 }
 
 /**
+ * Relative link targets in markdown, outside code
+ */
+function relativeLinks(markdown: string): string[] {
+  const prose = markdown.replace(/^```[\s\S]*?^```/gm, '').replace(/`[^`\n]*`/g, '');
+  return [...prose.matchAll(/\]\(([^)\s]+)\)/g)]
+    .map((match) => match[1].split('#')[0])
+    .filter((target) => target && !/^[a-z]+:/i.test(target));
+}
+
+/**
+ * Validate that SKILL.md links every rule and that relative links resolve
+ */
+async function validateLinks(ruleFiles: string[]): Promise<ValidationError[]> {
+  const errors: ValidationError[] = [];
+  const skillFile = join(SKILL_DIR, 'SKILL.md');
+  const sources = [
+    skillFile,
+    ...(await readdir(RULES_DIR))
+      .filter((f) => f.endsWith('.md') && f !== '_template.md')
+      .map((f) => join(RULES_DIR, f)),
+  ];
+  const skillLinks = new Set<string>();
+
+  for (const source of sources) {
+    for (const target of relativeLinks(await readFile(source, 'utf-8'))) {
+      const resolved = join(dirname(source), target);
+      if (source === skillFile) skillLinks.add(resolved);
+      if (!existsSync(resolved)) {
+        errors.push({
+          file: relative(SKILL_DIR, source),
+          message: `Link to "${target}" does not resolve`,
+        });
+      }
+    }
+  }
+
+  for (const file of ruleFiles) {
+    if (!skillLinks.has(join(RULES_DIR, file))) {
+      errors.push({
+        file,
+        message: `SKILL.md does not link to this rule (${relative(SKILL_DIR, join(RULES_DIR, file))})`,
+      });
+    }
+  }
+
+  return errors;
+}
+
+/**
  * Main validation function
  */
 async function validate() {
@@ -212,6 +270,8 @@ async function validate() {
         });
       }
     }
+
+    allErrors.push(...(await validateLinks(ruleFiles)));
 
     if (allErrors.length > 0) {
       // Dedupe repeated messages from source/object validation overlap.

@@ -22,8 +22,8 @@ if (!existsSync(skillDir)) {
 
 mkdirSync(destDir, { recursive: true });
 
-// Copy rules directory
-cpSync(join(skillDir, 'rules'), join(destDir, 'rules'), {
+// Copy the rule references
+cpSync(join(skillDir, 'references'), join(destDir, 'references'), {
   recursive: true,
   filter: (src) => {
     const name = src.split(/[/\\]/).pop();

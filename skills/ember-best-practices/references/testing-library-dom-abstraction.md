@@ -318,9 +318,9 @@ export function getModal(container) {
 
 ## Related Patterns
 
-- **component-avoid-classes-in-examples.md** - Avoid exposing implementation details
-- **testing-modern-patterns.md** - Modern testing approaches
-- **testing-render-patterns.md** - Component testing patterns
+- [component-avoid-classes-in-examples](component-avoid-classes-in-examples.md) - Avoid exposing implementation details
+- [testing-modern-patterns](testing-modern-patterns.md) - Modern testing approaches
+- [testing-render-patterns](testing-render-patterns.md) - Component testing patterns
 
 ## References
 
