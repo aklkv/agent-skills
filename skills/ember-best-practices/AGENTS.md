@@ -2033,11 +2033,11 @@ export class ProfileCard extends Component {
 
 - [Strict Mode Semantics](https://github.com/emberjs/rfcs/blob/master/text/0496-handlebars-strict-mode.md)
 
-- component-use-glimmer.md - Modern Glimmer component patterns
+- [component-use-glimmer](references/component-use-glimmer.md) - Modern Glimmer component patterns
 
-- component-strict-mode.md - Template-only components and strict mode
+- [component-strict-mode](references/component-strict-mode.md) - Template-only components and strict mode
 
-- route-templates.md - Route file naming conventions
+- [route-templates](references/route-templates.md) - Route file naming conventions
 
 ### 3.7 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
 
@@ -8133,11 +8133,11 @@ For solo projects, the benefit is smaller but still valuable:
 
 **After:** Minimal test maintenance when refactoring components
 
-- **component-avoid-classes-in-examples.md** - Avoid exposing implementation details
+- [component-avoid-classes-in-examples](references/component-avoid-classes-in-examples.md) - Avoid exposing implementation details
 
-- **testing-modern-patterns.md** - Modern testing approaches
+- [testing-modern-patterns](references/testing-modern-patterns.md) - Modern testing approaches
 
-- **testing-render-patterns.md** - Component testing patterns
+- [testing-render-patterns](references/testing-render-patterns.md) - Component testing patterns
 
 - [Testing Best Practices - ember-learn](https://guides.emberjs.com/release/testing/)
 
@@ -8676,7 +8676,7 @@ module('Acceptance | posts', function (hooks) {
 });
 ```
 
-**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See `testing-msw-setup.md` for detailed setup instructions.
+**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See [testing-msw-setup](references/testing-msw-setup.md) for detailed setup instructions.
 
 **Accessibility testing:**
 
@@ -10080,7 +10080,7 @@ class FormActions extends Component {
 
 - ❌ Simple async without user concurrency concerns (use async/await)
 
-See **advanced-data-loading-with-ember-concurrency.md** for correct data loading patterns.
+See [advanced-data-loading-with-ember-concurrency](references/advanced-data-loading-with-ember-concurrency.md) for correct data loading patterns.
 
 ember-concurrency provides automatic cancelation, derived state (isRunning, isIdle), and better patterns for **user-initiated** async operations.
 
