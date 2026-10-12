@@ -9,6 +9,8 @@ tags: events, modifiers, on, performance
 
 Use the `{{on}}` modifier for event handling instead of traditional action handlers for better memory management and clearer code.
 
+`on` and `fn` are keywords in strict-mode templates since Ember 7.1. On older versions, import `on` from `@ember/modifier` and `fn` from `@ember/helper`.
+
 **Incorrect (traditional action attribute):**
 
 ```glimmer-js
@@ -35,7 +37,6 @@ class Button extends Component {
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { on } from '@ember/modifier';
 
 class Button extends Component {
   handleClick = () => {
@@ -55,7 +56,6 @@ class Button extends Component {
 ```glimmer-js
 // app/components/scroll-tracker.gjs
 import Component from '@glimmer/component';
-import { on } from '@ember/modifier';
 
 class ScrollTracker extends Component {
   handleScroll = (event) => {
@@ -76,7 +76,6 @@ class ScrollTracker extends Component {
 // app/components/input-field.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { on } from '@ember/modifier';
 
 class InputField extends Component {
   @tracked isFocused = false;
@@ -110,9 +109,6 @@ class InputField extends Component {
 
 ```glimmer-js
 // app/components/item-list.gjs
-import { fn } from '@ember/helper';
-import { on } from '@ember/modifier';
-
 <template>
   <ul>
     {{#each @items as |item|}}

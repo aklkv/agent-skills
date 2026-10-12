@@ -2,7 +2,7 @@
 title: Use Helper Libraries Effectively
 impact: MEDIUM
 impactDescription: Reduces custom helper maintenance and keeps templates concise
-tags: templates, helpers, ember-truth-helpers, ember-composable-helpers
+tags: templates, helpers, ember-truth-helpers
 ---
 
 ## Use Helper Libraries Effectively
@@ -35,26 +35,23 @@ class UserBadge extends Component {
 
 ## Solution
 
-**Note:** These helpers will be built into Ember 7 core, but currently require installing the respective addon packages.
-
-**Installation:**
+**Note:** Ember 7.1 builds these helpers into strict-mode templates as keywords. On older versions, install the addon:
 
 ```bash
-npm install ember-truth-helpers ember-composable-helpers
+npm install ember-truth-helpers
 ```
 
-Use helper libraries like `ember-truth-helpers` and `ember-composable-helpers`:
+Use the helpers built into strict-mode templates. Since Ember 7.1, `eq`, `neq`, `not`, `and`, `or`, `lt`, `lte`, `gt`, `gte`, `array`, `hash` and `fn` are keywords that need no import. On older versions, import them from `ember-truth-helpers` and `@ember/helper`:
 
 **Correct:**
 
 ```glimmer-js
 // app/components/user-badge.gjs
 import Component from '@glimmer/component';
-import { eq } from 'ember-truth-helpers';
 
 class UserBadge extends Component {
   <template>
-    {{! eq helper from ember-truth-helpers }}
+    {{! eq is a keyword since Ember 7.1 }}
     {{#if (eq @user.role "admin")}}
       <span class="badge">Admin</span>
     {{/if}}
@@ -62,14 +59,13 @@ class UserBadge extends Component {
 }
 ```
 
-## Comparison Helpers (ember-truth-helpers)
+## Comparison Helpers
 
-**Installation:** `npm install ember-truth-helpers`
+Keywords since Ember 7.1. On older versions, install `ember-truth-helpers` and import them from it.
 
 ```glimmer-js
 // app/components/comparison-examples.gjs
 import Component from '@glimmer/component';
-import { eq, not, and, or, lt, lte, gt, gte } from 'ember-truth-helpers';
 
 class ComparisonExamples extends Component {
   <template>
@@ -92,15 +88,14 @@ class ComparisonExamples extends Component {
 }
 ```
 
-## Array and Object Helpers (ember-composable-helpers)
+## Array and Object Helpers
 
-**Installation:** `npm install ember-composable-helpers`
+`array` and `hash` are keywords since Ember 7.1; on older versions, import them from `@ember/helper`. `get` is imported from `@ember/helper`.
 
 ```glimmer-js
 // app/components/collection-helpers.gjs
 import Component from '@glimmer/component';
-import { array, hash } from 'ember-composable-helpers/helpers';
-import { get } from 'ember-composable-helpers/helpers';
+import { get } from '@ember/helper';
 
 class CollectionHelpers extends Component {
   <template>
@@ -145,11 +140,11 @@ class StringHelpers extends Component {
 
 ## Action Helpers (fn)
 
+`fn` and `on` are keywords since Ember 7.1. On older versions, import `fn` from `@ember/helper` and `on` from `@ember/modifier`.
+
 ```glimmer-js
 // app/components/action-helpers.gjs
 import Component from '@glimmer/component';
-import { fn } from '@ember/helper'; // Built-in to Ember
-import { on } from '@ember/modifier';
 
 class ActionHelpers extends Component {
   updateValue = (field, event) => {
@@ -178,25 +173,26 @@ class ActionHelpers extends Component {
 
 ## Conditional Helpers (if/unless)
 
+`if` and `unless` are keywords in every Ember version, inline or as blocks; there is nothing to import.
+
 ```glimmer-js
 // app/components/conditional-inline.gjs
 import Component from '@glimmer/component';
-import { if as ifHelper } from '@ember/helper'; // Built-in to Ember
 
 class ConditionalInline extends Component {
   <template>
     {{! Ternary-like behavior }}
-    <span class={{ifHelper @isActive "active" "inactive"}}>
+    <span class={{if @isActive "active" "inactive"}}>
       {{@user.name}}
     </span>
 
     {{! Conditional attribute }}
-    <button disabled={{ifHelper @isProcessing true}}>
-      {{ifHelper @isProcessing "Processing..." "Submit"}}
+    <button disabled={{if @isProcessing true}}>
+      {{if @isProcessing "Processing..." "Submit"}}
     </button>
 
     {{! With default value }}
-    <p>{{ifHelper @description @description "No description provided"}}</p>
+    <p>{{if @description @description "No description provided"}}</p>
   </template>
 }
 ```
@@ -208,16 +204,15 @@ class ConditionalInline extends Component {
 ```glimmer-js
 // app/components/dynamic-classes.gjs
 import Component from '@glimmer/component';
-import { concat, if as ifHelper } from '@ember/helper'; // Built-in to Ember
-import { and, not } from 'ember-truth-helpers';
+import { concat } from '@ember/helper';
 
 class DynamicClasses extends Component {
   <template>
     <div
       class={{concat
         "card "
-        (ifHelper @isPremium "premium ")
-        (ifHelper (and @isNew (not @isRead)) "unread ")
+        (if @isPremium "premium ")
+        (if (and @isNew (not @isRead)) "unread ")
         @customClass
       }}
     >
@@ -234,10 +229,7 @@ class DynamicClasses extends Component {
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { cached } from '@glimmer/tracking';
-import { fn, concat } from '@ember/helper';
-import { on } from '@ember/modifier';
-import { eq } from 'ember-truth-helpers';
-import { array } from 'ember-composable-helpers/helpers';
+import { concat } from '@ember/helper';
 
 class FilteredList extends Component {
   @tracked filter = 'all';
@@ -271,10 +263,7 @@ class FilteredList extends Component {
 ```glimmer-js
 // app/components/user-profile-card.gjs
 import Component from '@glimmer/component';
-import { concat, if as ifHelper, fn } from '@ember/helper'; // Built-in to Ember
-import { eq, not, and, or } from 'ember-truth-helpers';
-import { hash, array, get } from 'ember-composable-helpers/helpers';
-import { on } from '@ember/modifier';
+import { concat, get } from '@ember/helper';
 
 class UserProfileCard extends Component {
   updateField = (field, value) => {
@@ -285,8 +274,8 @@ class UserProfileCard extends Component {
     <div
       class={{concat
         "profile-card "
-        (ifHelper @user.isPremium "premium ")
-        (ifHelper (and @user.isOnline (not @user.isAway)) "online ")
+        (if @user.isPremium "premium ")
+        (if (and @user.isOnline (not @user.isAway)) "online ")
       }}
     >
       <h2>{{concat @user.firstName " " @user.lastName}}</h2>
@@ -308,8 +297,8 @@ class UserProfileCard extends Component {
         </div>
       {{/if}}
 
-      <p class={{ifHelper @user.verified "verified" "unverified"}}>
-        {{ifHelper @user.bio @user.bio "No bio provided"}}
+      <p class={{if @user.verified "verified" "unverified"}}>
+        {{if @user.bio @user.bio "No bio provided"}}
       </p>
     </div>
   </template>
@@ -330,28 +319,27 @@ class UserProfileCard extends Component {
 
 ## Complete Helper Reference
 
-**Note:** These helpers will be built into Ember 7 core. Until then:
+**Keywords in strict-mode templates since Ember 7.1 (no import):**
 
-**Actually Built-in to Ember (from `@ember/helper`):**
-
-- `concat` - Concatenate strings
 - `fn` - Partial application / bind arguments
-- `if` - Ternary-like conditional value
+- `hash` - Create object inline
+- `array` - Create array inline
+- `eq`, `neq` - Equality (===, !==)
+- `not`, `and`, `or` - Logic
+- `lt`, `lte`, `gt`, `gte` - Numeric comparisons
+- `on` - Event listener modifier
+
+**Keywords in every version:**
+
+- `if`, `unless` - Conditional value or block
 - `mut` - Create settable binding (use sparingly)
 
-**From `ember-truth-helpers` package:**
+**Imported from `@ember/helper`:**
 
-- `eq` - Equality (===)
-- `not` - Negation (!)
-- `and` - Logical AND
-- `or` - Logical OR
-- `lt`, `lte`, `gt`, `gte` - Numeric comparisons
-
-**From `ember-composable-helpers` package:**
-
-- `array` - Create array inline
-- `hash` - Create object inline
+- `concat` - Concatenate strings
 - `get` - Dynamic property access
+
+**On Ember < 7.1:** import `fn`, `hash` and `array` from `@ember/helper`, `on` from `@ember/modifier`, and the comparison and logic helpers from `ember-truth-helpers`.
 
 ## References
 
@@ -359,4 +347,3 @@ class UserProfileCard extends Component {
 - [Template Helpers API](https://api.emberjs.com/ember/release/modules/@ember%2Fhelper)
 - [fn Helper Guide](https://guides.emberjs.com/release/components/helper-functions/)
 - [ember-truth-helpers](https://github.com/jmurphyau/ember-truth-helpers)
-- [ember-composable-helpers](https://github.com/DockYard/ember-composable-helpers)

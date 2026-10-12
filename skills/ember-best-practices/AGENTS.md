@@ -46,7 +46,7 @@ Comprehensive performance optimization and accessibility guide for Ember.js appl
    - 3.13 [Use Glimmer Components Over Classic Components](#313-use-glimmer-components-over-classic-components)
    - 3.14 [Use Native Forms with Platform Validation](#314-use-native-forms-with-platform-validation)
    - 3.15 [Use Strict Mode and Template-Only Components](#315-use-strict-mode-and-template-only-components)
-   - 3.16 [Use Tracked Toolbox for Complex State](#316-use-tracked-toolbox-for-complex-state)
+   - 3.16 [Use Tracked Collections for Complex State](#316-use-tracked-collections-for-complex-state)
    - 3.17 [Validate Component Arguments](#317-validate-component-arguments)
 4. [Accessibility Best Practices](#4-accessibility-best-practices) — **HIGH**
    - 4.1 [Announce Route Transitions to Screen Readers](#41-announce-route-transitions-to-screen-readers)
@@ -2427,6 +2427,8 @@ Reference: [https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable](
 
 Use the `{{on}}` modifier for event handling instead of traditional action handlers for better memory management and clearer code.
 
+`on` and `fn` are keywords in strict-mode templates since Ember 7.1. On older versions, import `on` from `@ember/modifier` and `fn` from `@ember/helper`.
+
 **Incorrect: traditional action attribute**
 
 ```glimmer-js
@@ -2453,7 +2455,6 @@ class Button extends Component {
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { on } from '@ember/modifier';
 
 class Button extends Component {
   handleClick = () => {
@@ -2473,7 +2474,6 @@ class Button extends Component {
 ```glimmer-js
 // app/components/scroll-tracker.gjs
 import Component from '@glimmer/component';
-import { on } from '@ember/modifier';
 
 class ScrollTracker extends Component {
   handleScroll = (event) => {
@@ -2494,7 +2494,6 @@ class ScrollTracker extends Component {
 // app/components/input-field.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { on } from '@ember/modifier';
 
 class InputField extends Component {
   @tracked isFocused = false;
@@ -2528,9 +2527,6 @@ class InputField extends Component {
 
 ```glimmer-js
 // app/components/item-list.gjs
-import { fn } from '@ember/helper';
-import { on } from '@ember/modifier';
-
 <template>
   <ul>
     {{#each @items as |item|}}
@@ -3613,11 +3609,11 @@ Template-only components are lighter, more performant, and easier to understand.
 
 Reference: [https://guides.emberjs.com/release/upgrading/current-edition/templates/](https://guides.emberjs.com/release/upgrading/current-edition/templates/)
 
-### 3.16 Use Tracked Toolbox for Complex State
+### 3.16 Use Tracked Collections for Complex State
 
 **Impact: HIGH (Cleaner state management)**
 
-For complex state patterns like maps, sets, and arrays that need fine-grained reactivity, use tracked-toolbox utilities instead of marking entire structures as @tracked.
+For complex state patterns like maps, sets, and arrays that need fine-grained reactivity, use the tracked collections from `@ember/reactive/collections` instead of marking entire structures as @tracked. They're built into Ember since 6.8; on older versions, use the `tracked-built-ins` addon.
 
 **Incorrect: tracking entire structures**
 
@@ -3640,14 +3636,14 @@ class TodoList extends Component {
 }
 ```
 
-**Correct: using tracked-toolbox**
+**Correct: using tracked collections**
 
 ```javascript
 import Component from '@glimmer/component';
-import { TrackedArray } from 'tracked-built-ins';
+import { trackedArray } from '@ember/reactive/collections';
 
 class TodoList extends Component {
-  items = new TrackedArray([]);
+  items = trackedArray([]);
 
   // Use arrow functions for methods used in templates (no @action needed)
   addItem = (item) => {
@@ -3665,17 +3661,17 @@ class TodoList extends Component {
 **Also useful for Maps and Sets:**
 
 ```javascript
-import { TrackedMap, TrackedSet } from 'tracked-built-ins';
+import { trackedMap, trackedSet } from '@ember/reactive/collections';
 
 class Cache extends Component {
-  cache = new TrackedMap(); // Fine-grained reactivity per key
-  selected = new TrackedSet(); // Fine-grained reactivity per item
+  cache = trackedMap(); // Fine-grained reactivity per key
+  selected = trackedSet(); // Fine-grained reactivity per item
 }
 ```
 
-tracked-built-ins provides fine-grained reactivity and better performance than replacing entire structures.
+Tracked collections provide fine-grained reactivity and better performance than replacing entire structures.
 
-Reference: [https://github.com/tracked-tools/tracked-built-ins](https://github.com/tracked-tools/tracked-built-ins)
+Reference: [https://rfcs.emberjs.com/id/1068-tracked-collections/](https://rfcs.emberjs.com/id/1068-tracked-collections/)
 
 ### 3.17 Validate Component Arguments
 
@@ -6040,13 +6036,8 @@ import { pluralize } from 'ember-inflector';
 </template>
 ```
 
-**Built-in and library helpers:**
-
 ```glimmer-js
 // app/components/conditional-content.gjs
-import { fn, hash } from '@ember/helper'; // Actually built-in to Ember
-import { eq, not } from 'ember-truth-helpers'; // From ember-truth-helpers addon
-
 <template>
   <div class="content">
     {{#if (eq @status "active")}}
@@ -6061,6 +6052,8 @@ import { eq, not } from 'ember-truth-helpers'; // From ember-truth-helpers addon
   </div>
 </template>
 ```
+
+**Built-in helpers:** since Ember 7.1, `fn`, `hash`, `on`, `eq` and `not` are keywords in strict-mode templates, so they need no import. On older versions, import `fn` and `hash` from `@ember/helper`, `on` from `@ember/modifier`, and `eq` and `not` from `ember-truth-helpers`.
 
 **Custom helper with imports:**
 
@@ -6089,7 +6082,6 @@ import { formatCurrency } from '../utils/format-currency';
 
 ```glimmer-ts
 // app/components/typed-component.gts
-import { fn } from '@ember/helper';
 import type { TOC } from '@ember/component/template-only';
 
 interface Signature {
@@ -7088,26 +7080,23 @@ class UserBadge extends Component {
 }
 ```
 
-**Note:** These helpers will be built into Ember 7 core, but currently require installing the respective addon packages.
-
-**Installation:**
-
 ```bash
-npm install ember-truth-helpers ember-composable-helpers
+npm install ember-truth-helpers
 ```
 
-Use helper libraries like `ember-truth-helpers` and `ember-composable-helpers`:
+**Note:** Ember 7.1 builds these helpers into strict-mode templates as keywords. On older versions, install the addon:
+
+Use the helpers built into strict-mode templates. Since Ember 7.1, `eq`, `neq`, `not`, `and`, `or`, `lt`, `lte`, `gt`, `gte`, `array`, `hash` and `fn` are keywords that need no import. On older versions, import them from `ember-truth-helpers` and `@ember/helper`:
 
 **Correct:**
 
 ```glimmer-js
 // app/components/user-badge.gjs
 import Component from '@glimmer/component';
-import { eq } from 'ember-truth-helpers';
 
 class UserBadge extends Component {
   <template>
-    {{! eq helper from ember-truth-helpers }}
+    {{! eq is a keyword since Ember 7.1 }}
     {{#if (eq @user.role "admin")}}
       <span class="badge">Admin</span>
     {{/if}}
@@ -7118,7 +7107,6 @@ class UserBadge extends Component {
 ```glimmer-js
 // app/components/comparison-examples.gjs
 import Component from '@glimmer/component';
-import { eq, not, and, or, lt, lte, gt, gte } from 'ember-truth-helpers';
 
 class ComparisonExamples extends Component {
   <template>
@@ -7144,8 +7132,7 @@ class ComparisonExamples extends Component {
 ```glimmer-js
 // app/components/collection-helpers.gjs
 import Component from '@glimmer/component';
-import { array, hash } from 'ember-composable-helpers/helpers';
-import { get } from 'ember-composable-helpers/helpers';
+import { get } from '@ember/helper';
 
 class CollectionHelpers extends Component {
   <template>
@@ -7189,8 +7176,6 @@ class StringHelpers extends Component {
 ```glimmer-js
 // app/components/action-helpers.gjs
 import Component from '@glimmer/component';
-import { fn } from '@ember/helper'; // Built-in to Ember
-import { on } from '@ember/modifier';
 
 class ActionHelpers extends Component {
   updateValue = (field, event) => {
@@ -7220,45 +7205,47 @@ class ActionHelpers extends Component {
 ```glimmer-js
 // app/components/conditional-inline.gjs
 import Component from '@glimmer/component';
-import { if as ifHelper } from '@ember/helper'; // Built-in to Ember
 
 class ConditionalInline extends Component {
   <template>
     {{! Ternary-like behavior }}
-    <span class={{ifHelper @isActive "active" "inactive"}}>
+    <span class={{if @isActive "active" "inactive"}}>
       {{@user.name}}
     </span>
 
     {{! Conditional attribute }}
-    <button disabled={{ifHelper @isProcessing true}}>
-      {{ifHelper @isProcessing "Processing..." "Submit"}}
+    <button disabled={{if @isProcessing true}}>
+      {{if @isProcessing "Processing..." "Submit"}}
     </button>
 
     {{! With default value }}
-    <p>{{ifHelper @description @description "No description provided"}}</p>
+    <p>{{if @description @description "No description provided"}}</p>
   </template>
 }
 ```
 
-**Installation:** `npm install ember-truth-helpers`
+Keywords since Ember 7.1. On older versions, install `ember-truth-helpers` and import them from it.
 
-**Installation:** `npm install ember-composable-helpers`
+`array` and `hash` are keywords since Ember 7.1; on older versions, import them from `@ember/helper`. `get` is imported from `@ember/helper`.
+
+`fn` and `on` are keywords since Ember 7.1. On older versions, import `fn` from `@ember/helper` and `on` from `@ember/modifier`.
+
+`if` and `unless` are keywords in every Ember version, inline or as blocks; there is nothing to import.
 
 **Dynamic Classes:**
 
 ```glimmer-js
 // app/components/dynamic-classes.gjs
 import Component from '@glimmer/component';
-import { concat, if as ifHelper } from '@ember/helper'; // Built-in to Ember
-import { and, not } from 'ember-truth-helpers';
+import { concat } from '@ember/helper';
 
 class DynamicClasses extends Component {
   <template>
     <div
       class={{concat
         "card "
-        (ifHelper @isPremium "premium ")
-        (ifHelper (and @isNew (not @isRead)) "unread ")
+        (if @isPremium "premium ")
+        (if (and @isNew (not @isRead)) "unread ")
         @customClass
       }}
     >
@@ -7275,10 +7262,7 @@ class DynamicClasses extends Component {
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { cached } from '@glimmer/tracking';
-import { fn, concat } from '@ember/helper';
-import { on } from '@ember/modifier';
-import { eq } from 'ember-truth-helpers';
-import { array } from 'ember-composable-helpers/helpers';
+import { concat } from '@ember/helper';
 
 class FilteredList extends Component {
   @tracked filter = 'all';
@@ -7310,10 +7294,7 @@ class FilteredList extends Component {
 ```glimmer-js
 // app/components/user-profile-card.gjs
 import Component from '@glimmer/component';
-import { concat, if as ifHelper, fn } from '@ember/helper'; // Built-in to Ember
-import { eq, not, and, or } from 'ember-truth-helpers';
-import { hash, array, get } from 'ember-composable-helpers/helpers';
-import { on } from '@ember/modifier';
+import { concat, get } from '@ember/helper';
 
 class UserProfileCard extends Component {
   updateField = (field, value) => {
@@ -7324,8 +7305,8 @@ class UserProfileCard extends Component {
     <div
       class={{concat
         "profile-card "
-        (ifHelper @user.isPremium "premium ")
-        (ifHelper (and @user.isOnline (not @user.isAway)) "online ")
+        (if @user.isPremium "premium ")
+        (if (and @user.isOnline (not @user.isAway)) "online ")
       }}
     >
       <h2>{{concat @user.firstName " " @user.lastName}}</h2>
@@ -7347,8 +7328,8 @@ class UserProfileCard extends Component {
         </div>
       {{/if}}
 
-      <p class={{ifHelper @user.verified "verified" "unverified"}}>
-        {{ifHelper @user.bio @user.bio "No bio provided"}}
+      <p class={{if @user.verified "verified" "unverified"}}>
+        {{if @user.bio @user.bio "No bio provided"}}
       </p>
     </div>
   </template>
@@ -7367,37 +7348,35 @@ class UserProfileCard extends Component {
 
 - **Component logic**: For complex operations that need @cached or multiple dependencies
 
-**Note:** These helpers will be built into Ember 7 core. Until then:
-
-**Actually Built-in to Ember (from `@ember/helper`):**
-
-- `concat` - Concatenate strings
+**Keywords in strict-mode templates since Ember 7.1 (no import):**
 
 - `fn` - Partial application / bind arguments
 
-- `if` - Ternary-like conditional value
-
-- `mut` - Create settable binding (use sparingly)
-
-**From `ember-truth-helpers` package:**
-
-- `eq` - Equality (===)
-
-- `not` - Negation (!)
-
-- `and` - Logical AND
-
-- `or` - Logical OR
-
-- `lt`, `lte`, `gt`, `gte` - Numeric comparisons
-
-**From `ember-composable-helpers` package:**
+- `hash` - Create object inline
 
 - `array` - Create array inline
 
-- `hash` - Create object inline
+- `eq`, `neq` - Equality (===, !==)
+
+- `not`, `and`, `or` - Logic
+
+- `lt`, `lte`, `gt`, `gte` - Numeric comparisons
+
+- `on` - Event listener modifier
+
+**Keywords in every version:**
+
+- `if`, `unless` - Conditional value or block
+
+- `mut` - Create settable binding (use sparingly)
+
+**Imported from `@ember/helper`:**
+
+- `concat` - Concatenate strings
 
 - `get` - Dynamic property access
+
+**On Ember < 7.1:** import `fn`, `hash` and `array` from `@ember/helper`, `on` from `@ember/modifier`, and the comparison and logic helpers from `ember-truth-helpers`.
 
 - [Ember Built-in Helpers](https://guides.emberjs.com/release/templates/built-in-helpers/)
 
@@ -7406,8 +7385,6 @@ class UserProfileCard extends Component {
 - [fn Helper Guide](https://guides.emberjs.com/release/components/helper-functions/)
 
 - [ember-truth-helpers](https://github.com/jmurphyau/ember-truth-helpers)
-
-- [ember-composable-helpers](https://github.com/DockYard/ember-composable-helpers)
 
 ---
 
