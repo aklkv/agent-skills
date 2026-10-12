@@ -9,7 +9,7 @@ metadata:
 
 # Ember.js Best Practices
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 58 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 59 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -65,6 +65,7 @@ Reference these guidelines when:
 - [component-controlled-forms](references/component-controlled-forms.md) - Implement controlled form patterns
 - [component-on-modifier](references/component-on-modifier.md) - Use {{on}} modifier for event handling
 - [component-args-validation](references/component-args-validation.md) - Validate component arguments
+- [component-signatures](references/component-signatures.md) - Write precise signatures for components, helpers and modifiers
 - [component-memory-leaks](references/component-memory-leaks.md) - Prevent memory leaks in components
 - [component-strict-mode](references/component-strict-mode.md) - Use strict mode and template-only components
 - [component-avoid-classes-in-examples](references/component-avoid-classes-in-examples.md) - Avoid unnecessary classes in component examples
