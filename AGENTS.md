@@ -8,7 +8,7 @@ A collection of [Agent Skills](https://agentskills.io/) for Ember.js projects, c
 
 ## Editing ember-best-practices
 
-Each rule is a file in `skills/ember-best-practices/rules/`. Its filename prefix places it in a section that `rules/_sections.md` defines (`route-`, `component-`, `a11y-` and so on). Start a new rule from `rules/_template.md`.
+Each rule is a file in `skills/ember-best-practices/references/`. Its filename prefix places it in a section that `references/_sections.md` defines (`route-`, `component-`, `a11y-` and so on). Start a new rule from `references/_template.md`.
 
 `skills/ember-best-practices/AGENTS.md` is generated from the rules, so don't edit it by hand:
 

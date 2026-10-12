@@ -132,9 +132,9 @@ Reference these guidelines when:
 Read individual rule files for detailed explanations and code examples:
 
 ```
-rules/route-parallel-model.md
-rules/bundle-embroider-static.md
-rules/a11y-automated-testing.md
+references/route-parallel-model.md
+references/bundle-embroider-static.md
+references/a11y-automated-testing.md
 ```
 
 Each rule file contains:

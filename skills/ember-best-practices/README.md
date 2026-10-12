@@ -4,7 +4,7 @@ A structured repository for creating and maintaining Ember.js Best Practices opt
 
 ## Structure
 
-- `rules/` - Individual rule files (one per rule)
+- `references/` - Individual rule files (one per rule), which agents load on demand ([Agent Skills references](https://agentskills.io/specification#references/))
   - `_sections.md` - Section metadata (titles, impacts, descriptions)
   - `_template.md` - Template for creating new rules
   - `area-description.md` - Individual rule files

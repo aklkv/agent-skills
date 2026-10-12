@@ -2,7 +2,7 @@
 set -e
 
 OUTPUT="AGENTS.md"
-RULES_DIR="rules"
+RULES_DIR="references"
 
 # Start with the header
 cat > "$OUTPUT" << 'HEADER'

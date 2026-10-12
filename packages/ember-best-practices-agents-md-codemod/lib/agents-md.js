@@ -45,7 +45,7 @@ export function getBundledBestPracticesPath() {
  */
 export function copyBestPractices(destDir) {
   const sourceDir = getBundledBestPracticesPath();
-  const rulesSource = path.join(sourceDir, 'rules');
+  const rulesSource = path.join(sourceDir, 'references');
   const rulesDest = path.join(destDir, 'rules');
 
   if (!fs.existsSync(rulesSource)) {
