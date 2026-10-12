@@ -14,14 +14,14 @@ Each rule is a file in `skills/ember-best-practices/references/`. Its filename p
 
 ```bash
 pnpm validate # checks the rule files against the template, that SKILL.md links each one, and that each links its documentation
-pnpm build    # regenerates AGENTS.md
+pnpm build    # regenerates AGENTS.md and the build package's test-cases.json
 ```
 
 To bump the skill's version too, run the build script with `--upgrade-version`; it updates `metadata.json` and `SKILL.md`.
 
 Then update `skills/ember-best-practices.zip` (see "Creating the Zip Package" below).
 
-CI runs `pnpm validate`, `pnpm build`, `pnpm lint:format` (Prettier) and the `skills-lint` package, which checks that skills only use allow-listed shell commands.
+CI runs `pnpm validate` and `pnpm build`, and fails if the build changes any file, so commit what it regenerates. It also runs `pnpm lint:format` (Prettier) and the `skills-lint` package, which checks that skills only use allow-listed shell commands.
 
 ## Creating a New Skill
 
