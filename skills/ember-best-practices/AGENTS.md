@@ -6307,18 +6307,19 @@ import { formatCurrency } from '../utils/format-currency';
 
 ```javascript
 // app/utils/format-relative-time.js
-export class FormatRelativeTime {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(date) {
+export class FormatRelativeTime extends Helper {
+  @service intl;
+
+  compute([date]) {
     return this.intl.formatRelative(date);
   }
 }
 ```
 
-When you need dependency injection, use a class instead of `helper()`:
+When you need services, extend `Helper` instead of using `helper()`:
 
 **Why Avoid helper():**
 
@@ -10310,16 +10311,17 @@ For truly shared helpers used across the whole app, use `app/utils/`:
 
 **Note**: Keep utils flat (`app/utils/format-relative-date.js`), not nested (`app/utils/date/format-relative-date.js`). If you need cleaner top-level imports, configure subpath-imports in package.json instead of nesting files.
 
-**For helpers with state, use class-based helpers:**
+**For helpers that need services, extend `Helper`:**
 
 ```javascript
-// app/utils/helpers/format-currency.js
-export class FormatCurrencyHelper {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+// app/utils/format-currency.js
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(amount, { currency = 'USD' } = {}) {
+export class FormatCurrencyHelper extends Helper {
+  @service intl;
+
+  compute([amount], { currency = 'USD' }) {
     return this.intl.formatNumber(amount, {
       style: 'currency',
       currency,
@@ -10327,6 +10329,8 @@ export class FormatCurrencyHelper {
   }
 }
 ```
+
+A class-based helper's `compute` receives the positional arguments as an array and the named arguments as an object.
 
 **Common helpers to create:**
 
