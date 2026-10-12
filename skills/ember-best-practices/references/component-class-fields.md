@@ -96,12 +96,11 @@ In most apps, you'll have very few tracked fields because most data comes from a
 ```glimmer-js
 // app/components/form-container.gjs
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { TrackedObject } from 'tracked-built-ins';
+import { trackedObject } from '@ember/reactive/collections';
 
 class FormContainer extends Component {
   // Compose form state
-  @tracked formData = new TrackedObject({
+  formData = trackedObject({
     firstName: '',
     lastName: '',
     email: '',
@@ -112,10 +111,10 @@ class FormContainer extends Component {
   });
 
   // Compose validation state
-  @tracked errors = new TrackedObject({});
+  errors = trackedObject({});
 
   // Compose UI state
-  @tracked ui = new TrackedObject({
+  ui = trackedObject({
     isSubmitting: false,
     isDirty: false,
     showErrors: false,
@@ -237,11 +236,10 @@ class PaginatedList extends Component {
 
 ```javascript
 // app/utils/selection-state.js
-import { tracked } from '@glimmer/tracking';
-import { TrackedSet } from 'tracked-built-ins';
+import { trackedSet } from '@ember/reactive/collections';
 
 export class SelectionState {
-  @tracked selectedIds = new TrackedSet();
+  selectedIds = trackedSet();
 
   get count() {
     return this.selectedIds.size;

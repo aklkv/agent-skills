@@ -91,12 +91,12 @@ export default class PostRoute extends Route {
 // app/services/post-cache.js
 import Service from '@ember/service';
 import { service } from '@ember/service';
-import { TrackedMap } from 'tracked-built-ins';
+import { trackedMap } from '@ember/reactive/collections';
 
 export default class PostCacheService extends Service {
   @service store;
 
-  cache = new TrackedMap();
+  cache = trackedMap();
   cacheTimes = new Map();
   cacheTimeout = 5 * 60 * 1000; // 5 minutes
 
