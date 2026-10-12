@@ -336,7 +336,7 @@ export default class DashboardRoute extends Route {
 
 Smart caching reduces server load, improves perceived performance, and provides better offline support while keeping data fresh.
 
-Reference: [https://warp-drive.io/](https://warp-drive.io/)
+Reference: [WarpDrive Caching](https://warp-drive.io/)
 
 ### 1.2 Parallel Data Loading in Model Hooks
 
@@ -389,6 +389,8 @@ export default class DashboardRoute extends Route {
 
 Using `hash()` from RSVP allows Ember to resolve all promises concurrently, significantly reducing load time.
 
+Reference: [Ember Guides: Specifying a Route's Model](https://guides.emberjs.com/release/routing/specifying-a-routes-model/), [MDN: Promise.all()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)
+
 ### 1.3 Use Loading Substates for Better UX
 
 **Impact: CRITICAL (Perceived performance improvement)**
@@ -432,6 +434,8 @@ export default class PostsRoute extends Route {
 
 Ember automatically renders `{route-name}-loading` route templates while the model promise resolves, providing better UX without extra code.
 
+Reference: [Ember Guides: Loading and Error Substates](https://guides.emberjs.com/release/routing/loading-and-error-substates/)
+
 ### 1.4 Use Route-Based Code Splitting
 
 **Impact: CRITICAL (30-70% initial bundle reduction)**
@@ -471,7 +475,7 @@ module.exports = require('@embroider/compat').compatBuild(app, Vite, {
 
 Embroider with `splitAtRoutes` creates separate bundles for specified routes, reducing initial load time by 30-70%.
 
-Reference: [https://github.com/embroider-build/embroider](https://github.com/embroider-build/embroider)
+Reference: [Embroider Documentation](https://github.com/embroider-build/embroider)
 
 ### 1.5 Use Separate Route and Template Files
 
@@ -579,7 +583,7 @@ export default class PostsRoute extends Route {
 
 Keeping route classes and route templates in their conventional files matches Ember's supported routing model and makes examples easier to apply in real apps.
 
-Reference: [https://guides.emberjs.com/release/routing/](https://guides.emberjs.com/release/routing/)
+Reference: [Ember Routes](https://guides.emberjs.com/release/routing/)
 
 ---
 
@@ -646,6 +650,8 @@ class My extends Component {
 ```
 
 Direct imports and using built-in Ember utilities reduce bundle size by avoiding unused code.
+
+Reference: [MDN: Tree shaking](https://developer.mozilla.org/en-US/docs/Glossary/Tree_shaking), [Embroider](https://github.com/embroider-build/embroider)
 
 ### 2.2 Lazy Load Heavy Dependencies
 
@@ -714,6 +720,8 @@ class Dashboard extends Component {
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
 
+Reference: [MDN: import()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import), [reactiveweb](https://reactive.nullvoxpopuli.com/)
+
 ### 2.3 Use Embroider Build Pipeline
 
 **Impact: CRITICAL (Modern build system with better performance)**
@@ -777,7 +785,7 @@ module.exports = async function (defaults) {
 
 Embroider provides a modern build pipeline with Vite that offers faster builds and better optimization compared to the classic Ember CLI build system.
 
-Reference: [https://github.com/embroider-build/embroider](https://github.com/embroider-build/embroider)
+Reference: [Embroider Documentation](https://github.com/embroider-build/embroider)
 
 ---
 
@@ -792,10 +800,6 @@ Proper use of Glimmer components, modern file conventions, tracked properties, a
 **Impact: HIGH (Prevents infinite render loops and simplifies code)**
 
 **Strongly discourage constructor usage.** Modern Ember components rarely need constructors. Use class fields, @service decorators, and getPromiseState for initialization instead. Constructors with function calls that set tracked state can cause infinite render loops.
-
-- [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/)
-
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
 
 **Incorrect: using constructor**
 
@@ -958,6 +962,8 @@ Very rarely, you might need a constructor for truly exceptional cases. Even then
 - **After**: Class fields initialize efficiently, getPromiseState auto-cleanup, no render loops
 
 **Strongly discourage constructors** - they add complexity and infinite render loop risks. Use declarative class fields and getPromiseState instead.
+
+Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
 
 ### 3.2 Avoid CSS Classes in Learning Examples
 
@@ -1144,7 +1150,7 @@ In production code, you'll have classes for styling. But in learning materials, 
 
 Keep learning examples focused on the concept being taught. CSS classes should appear only when they're essential to understanding the pattern or when demonstrating styling flexibility with `...attributes`.
 
-Reference: [https://guides.emberjs.com/release/components/](https://guides.emberjs.com/release/components/)
+Reference: [Ember Components Guide](https://guides.emberjs.com/release/components/)
 
 ### 3.3 Avoid Legacy Lifecycle Hooks (did-insert, will-destroy, did-update)
 
@@ -1163,12 +1169,6 @@ Reference: [https://guides.emberjs.com/release/components/](https://guides.ember
 5. **Deprecated Pattern**: Not recommended in modern Ember
 
 For computed values or reactive transformations, use getters and `@cached`:
-
-- [Ember Modifiers](https://github.com/ember-modifier/ember-modifier)
-
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
-
-- [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 **❌ Incorrect (did-update):**
 
@@ -1471,6 +1471,8 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+
 ### 3.4 Avoid Unnecessary Tracking
 
 **Impact: HIGH (20-40% fewer invalidations)**
@@ -1523,6 +1525,8 @@ class Form extends Component {
 ```
 
 Only track properties that directly affect the template or other tracked getters to minimize unnecessary re-renders.
+
+Reference: [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 3.5 Build Reactive Chains with Dependent Getters
 
@@ -1810,7 +1814,7 @@ class FilteredList extends Component {
 
 Reactive getter chains provide automatic updates, clear data dependencies, and better performance through intelligent caching with @cached.
 
-Reference: [https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 3.6 Component File Naming and Export Conventions
 
@@ -2033,11 +2037,11 @@ export class ProfileCard extends Component {
 
 - [Strict Mode Semantics](https://github.com/emberjs/rfcs/blob/master/text/0496-handlebars-strict-mode.md)
 
-- component-use-glimmer.md - Modern Glimmer component patterns
+- [component-use-glimmer](references/component-use-glimmer.md) - Modern Glimmer component patterns
 
-- component-strict-mode.md - Template-only components and strict mode
+- [component-strict-mode](references/component-strict-mode.md) - Template-only components and strict mode
 
-- route-templates.md - Route file naming conventions
+- [route-templates](references/route-templates.md) - Route file naming conventions
 
 ### 3.7 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
 
@@ -2419,7 +2423,7 @@ class WebsocketData extends Component {
 
 Always clean up timers, event listeners, subscriptions, and pending requests to prevent memory leaks and performance degradation.
 
-Reference: [https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable](https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable)
+Reference: [Ember Destroyable](https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable)
 
 ### 3.9 Use {{on}} Modifier for Event Handling
 
@@ -2543,7 +2547,7 @@ class InputField extends Component {
 
 The `{{on}}` modifier properly cleans up event listeners, supports event options (passive, capture, once), and makes event handling more explicit.
 
-Reference: [https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_event-handlers](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_event-handlers)
+Reference: [Ember Modifiers - on](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_event-handlers)
 
 ### 3.10 Use @cached for Expensive Getters
 
@@ -2592,7 +2596,7 @@ class DataTable extends Component {
 
 `@cached` memoizes the getter result and only recomputes when tracked dependencies change, providing 50-90% reduction in unnecessary work.
 
-Reference: [https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/#toc_caching](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/#toc_caching)
+Reference: [@cached decorator](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/#toc_caching)
 
 ### 3.11 Use Class Fields for Component Composition
 
@@ -2914,7 +2918,7 @@ class SelectableList extends Component {
 
 Class fields provide clean composition patterns, better initialization, and shareable state objects that can be tested independently.
 
-Reference: [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields)
+Reference: [JavaScript Class Fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields)
 
 ### 3.12 Use Component Composition Patterns
 
@@ -3151,7 +3155,7 @@ import Dropdown from './dropdown';
 
 Component composition provides flexibility, reusability, and clean separation of concerns while maintaining type safety and clarity.
 
-Reference: [https://guides.emberjs.com/release/components/block-content/](https://guides.emberjs.com/release/components/block-content/)
+Reference: [Ember Components - Block Parameters](https://guides.emberjs.com/release/components/block-content/)
 
 ### 3.13 Use Glimmer Components Over Classic Components
 
@@ -3203,7 +3207,7 @@ class UserCard extends Component {
 
 Glimmer components are 30-50% faster, have cleaner APIs, and integrate better with tracked properties.
 
-Reference: [https://guides.emberjs.com/release/components/component-state-and-actions/](https://guides.emberjs.com/release/components/component-state-and-actions/)
+Reference: [Glimmer Components](https://guides.emberjs.com/release/components/component-state-and-actions/)
 
 ### 3.14 Use Native Forms with Platform Validation
 
@@ -3607,7 +3611,7 @@ module.exports = function (defaults) {
 
 Template-only components are lighter, more performant, and easier to understand. Strict mode provides better error messages and prevents common mistakes.
 
-Reference: [https://guides.emberjs.com/release/upgrading/current-edition/templates/](https://guides.emberjs.com/release/upgrading/current-edition/templates/)
+Reference: [Ember Strict Mode](https://guides.emberjs.com/release/upgrading/current-edition/templates/)
 
 ### 3.16 Use Tracked Collections for Complex State
 
@@ -3671,7 +3675,7 @@ class Cache extends Component {
 
 Tracked collections provide fine-grained reactivity and better performance than replacing entire structures.
 
-Reference: [https://rfcs.emberjs.com/id/1068-tracked-collections/](https://rfcs.emberjs.com/id/1068-tracked-collections/)
+Reference: [RFC #1068: Tracked Collections](https://rfcs.emberjs.com/id/1068-tracked-collections/)
 
 ### 3.17 Validate Component Arguments
 
@@ -3841,7 +3845,7 @@ class Modal extends Component {
 
 Argument validation provides better error messages during development, serves as documentation, and enables better IDE support.
 
-Reference: [https://guides.emberjs.com/release/typescript/](https://guides.emberjs.com/release/typescript/)
+Reference: [TypeScript in Ember](https://guides.emberjs.com/release/typescript/)
 
 ---
 
@@ -4037,7 +4041,7 @@ If you prefer not to use a library, you can implement route announcements yourse
 
 Route announcements ensure screen reader users know when navigation occurs, improving the overall accessibility experience.
 
-Reference: [https://guides.emberjs.com/release/accessibility/page-template-considerations/](https://guides.emberjs.com/release/accessibility/page-template-considerations/)
+Reference: [Ember Accessibility - Page Titles](https://guides.emberjs.com/release/accessibility/page-template-considerations/)
 
 ### 4.2 Form Labels and Error Announcements
 
@@ -4178,7 +4182,7 @@ class UserForm extends Component {
 
 Always associate labels with inputs and announce dynamic changes to screen readers using aria-live regions.
 
-Reference: [https://guides.emberjs.com/release/accessibility/application-considerations/](https://guides.emberjs.com/release/accessibility/application-considerations/)
+Reference: [Ember Accessibility - Application Considerations](https://guides.emberjs.com/release/accessibility/application-considerations/)
 
 ### 4.3 Keyboard Navigation Support
 
@@ -4337,7 +4341,7 @@ Or use [tabster](https://tabster.io/) for comprehensive keyboard navigation mana
 
 Proper keyboard navigation ensures all users can interact with your application effectively.
 
-Reference: [https://guides.emberjs.com/release/accessibility/keyboard/](https://guides.emberjs.com/release/accessibility/keyboard/)
+Reference: [Ember Accessibility - Keyboard](https://guides.emberjs.com/release/accessibility/keyboard/)
 
 ### 4.4 Semantic HTML and ARIA Attributes
 
@@ -4514,7 +4518,7 @@ If you must suppress a rule temporarily, treat it as an exception: document why 
 
 ember-a11y-testing catches issues like missing labels, insufficient color contrast, invalid ARIA, and keyboard navigation problems automatically.
 
-Reference: [https://github.com/ember-a11y/ember-a11y-testing](https://github.com/ember-a11y/ember-a11y-testing)
+Reference: [ember-a11y-testing](https://github.com/ember-a11y/ember-a11y-testing)
 
 ---
 
@@ -4617,6 +4621,8 @@ export default class DataService extends Service {
 ```
 
 Caching in services prevents duplicate API requests and improves performance significantly.
+
+Reference: [Ember Guides: Services](https://guides.emberjs.com/release/services/)
 
 ### 5.2 Implement Robust Data Requesting Patterns
 
@@ -5403,7 +5409,7 @@ class FeatureGated extends Component {
 
 - **Runtime registration**: Dynamic configuration, feature flags, testing
 
-Reference: [https://api.emberjs.com/ember/release/functions/@ember%2Fapplication/getOwner](https://api.emberjs.com/ember/release/functions/@ember%2Fapplication/getOwner), [https://guides.emberjs.com/release/applications/dependency-injection/](https://guides.emberjs.com/release/applications/dependency-injection/), [https://reactive.nullvoxpopuli.com/functions/link.link.html](https://reactive.nullvoxpopuli.com/functions/link.link.html), [https://ce1d7e18.ember-primitives.pages.dev/6-utils/createService.md](https://ce1d7e18.ember-primitives.pages.dev/6-utils/createService.md)
+Reference: [Ember Owner API](https://api.emberjs.com/ember/release/functions/@ember%2Fapplication/getOwner), [Dependency Injection](https://guides.emberjs.com/release/applications/dependency-injection/), [reactiveweb link()](https://reactive.nullvoxpopuli.com/functions/link.link.html), [ember-primitives createService](https://ce1d7e18.ember-primitives.pages.dev/6-utils/createService.md)
 
 ### 5.4 Optimize WarpDrive Queries
 
@@ -5528,7 +5534,7 @@ model() {
 
 Efficient WarpDrive usage reduces network overhead and improves application performance significantly.
 
-Reference: [https://warp-drive.io/](https://warp-drive.io/)
+Reference: [WarpDrive Documentation](https://warp-drive.io/)
 
 ### 5.5 Use Services for Shared State
 
@@ -5643,7 +5649,7 @@ export default class CartService extends Service {
 }
 ```
 
-Reference: [https://guides.emberjs.com/release/services/](https://guides.emberjs.com/release/services/)
+Reference: [Ember Services](https://guides.emberjs.com/release/services/)
 
 ---
 
@@ -5745,6 +5751,8 @@ export class Stats extends Component {
 **Note on @cached**: Use `@cached` when a getter is accessed multiple times (like in `{{#each}}` loops or by other getters). For getters accessed only once, regular getters are sufficient and avoid unnecessary memoization overhead.
 
 Moving computations to getters ensures they run only when dependencies change, not on every render. Templates remain clean and readable.
+
+Reference: [Ember API: @cached](https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/cached), [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 6.2 Compose Helpers for Reusable Logic
 
@@ -5998,7 +6006,7 @@ module('Unit | Helper | display-name', function () {
 
 Composed helpers provide testable, reusable logic that keeps templates clean and components focused on behavior rather than data transformation.
 
-Reference: [https://guides.emberjs.com/release/components/helper-functions/](https://guides.emberjs.com/release/components/helper-functions/)
+Reference: [Ember Helpers](https://guides.emberjs.com/release/components/helper-functions/)
 
 ### 6.3 Import Helpers Directly in Templates
 
@@ -6106,7 +6114,7 @@ export default TypedComponent;
 
 Explicit helper imports enable better tree-shaking, make dependencies clear, and improve IDE support with proper type checking.
 
-Reference: [https://github.com/ember-template-imports/ember-template-imports](https://github.com/ember-template-imports/ember-template-imports)
+Reference: [Template Imports](https://github.com/ember-template-imports/ember-template-imports)
 
 ### 6.4 No helper() Wrapper for Plain Functions
 
@@ -6251,7 +6259,7 @@ import { capitalize, truncate, pluralize } from '../utils/string-helpers';
 
 Plain functions are the modern way to create helpers in Ember. Only use classes when you need dependency injection.
 
-Reference: [https://guides.emberjs.com/release/components/helper-functions/](https://guides.emberjs.com/release/components/helper-functions/)
+Reference: [Ember Helpers - Plain Functions](https://guides.emberjs.com/release/components/helper-functions/)
 
 ### 6.5 Optimize Conditional Rendering
 
@@ -6740,7 +6748,7 @@ export function round(number, decimals = 2) {
 
 5. **Export for testing** - Export functions so they can be tested independently
 
-Reference: [https://guides.emberjs.com/release/components/component-types/](https://guides.emberjs.com/release/components/component-types/), [https://guides.emberjs.com/release/components/conditional-content/](https://guides.emberjs.com/release/components/conditional-content/)
+Reference: [Template-only Components](https://guides.emberjs.com/release/components/component-types/), [Component Authoring Best Practices](https://guides.emberjs.com/release/components/conditional-content/)
 
 ### 6.7 Use {{#each}} with @key for Lists
 
@@ -6908,6 +6916,8 @@ Use `{{#let}}` to compute expensive values once and reuse them in the template i
 
 `{{#let}}` computes values once and caches them for the block scope, reducing redundant calculations.
 
+Reference: [Ember API: let](https://api.emberjs.com/ember/release/classes/Ember.Templates.helpers/methods/let)
+
 ### 6.9 Use {{fn}} for Partial Application Only
 
 **Impact: LOW-MEDIUM (Clearer code, avoid unnecessary wrapping)**
@@ -7050,7 +7060,7 @@ const directFn = this.handleSearch; // No pre-binding
 
 Only use `{{fn}}` when you're binding arguments. For simple function references, pass them directly.
 
-Reference: [https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_passing-arguments-to-functions](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_passing-arguments-to-functions)
+Reference: [Ember Templates - fn Helper](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_passing-arguments-to-functions)
 
 ### 6.10 Use Helper Libraries Effectively
 
@@ -7830,7 +7840,7 @@ test('lists posts', async function (assert) {
 });
 ```
 
-Reference: [https://discuss.emberjs.com/t/my-cookbook-for-various-emberjs-things/19679](https://discuss.emberjs.com/t/my-cookbook-for-various-emberjs-things/19679), [https://mswjs.io/docs/](https://mswjs.io/docs/)
+Reference: [Ember.js Community Discussion on MSW](https://discuss.emberjs.com/t/my-cookbook-for-various-emberjs-things/19679), [MSW Documentation](https://mswjs.io/docs/)
 
 ### 8.2 Provide DOM-Abstracted Test Utilities for Library Components
 
@@ -8133,11 +8143,11 @@ For solo projects, the benefit is smaller but still valuable:
 
 **After:** Minimal test maintenance when refactoring components
 
-- **component-avoid-classes-in-examples.md** - Avoid exposing implementation details
+- [component-avoid-classes-in-examples](references/component-avoid-classes-in-examples.md) - Avoid exposing implementation details
 
-- **testing-modern-patterns.md** - Modern testing approaches
+- [testing-modern-patterns](references/testing-modern-patterns.md) - Modern testing approaches
 
-- **testing-render-patterns.md** - Component testing patterns
+- [testing-render-patterns](references/testing-render-patterns.md) - Component testing patterns
 
 - [Testing Best Practices - ember-learn](https://guides.emberjs.com/release/testing/)
 
@@ -8405,7 +8415,7 @@ await render(
 
 Using the appropriate render pattern keeps tests clean and expressive.
 
-Reference: [https://guides.emberjs.com/release/testing/](https://guides.emberjs.com/release/testing/)
+Reference: [Ember Testing Guide](https://guides.emberjs.com/release/testing/)
 
 ### 8.4 Use Modern Testing Patterns
 
@@ -8676,7 +8686,7 @@ module('Acceptance | posts', function (hooks) {
 });
 ```
 
-**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See `testing-msw-setup.md` for detailed setup instructions.
+**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See [testing-msw-setup](references/testing-msw-setup.md) for detailed setup instructions.
 
 **Accessibility testing:**
 
@@ -8748,7 +8758,7 @@ class UserProfile extends Component {
 
 Modern testing patterns with `@ember/test-helpers`, `qunit-dom`, and data-test attributes provide better test reliability, readability, and maintainability.
 
-Reference: [https://guides.emberjs.com/release/testing/](https://guides.emberjs.com/release/testing/)
+Reference: [Ember Testing](https://guides.emberjs.com/release/testing/)
 
 ### 8.5 Use qunit-dom for Better Test Assertions
 
@@ -9393,7 +9403,7 @@ export class ParallelLoader extends Component {
 
 **Key principle:** If your code does something async that users care about, register it with a test waiter. Tests should never use `waitFor()` or `waitUntil()` - those are code smells indicating missing test waiters.
 
-Reference: [https://github.com/emberjs/ember-test-waiters](https://github.com/emberjs/ember-test-waiters)
+Reference: [@ember/test-waiters](https://github.com/emberjs/ember-test-waiters)
 
 ---
 
@@ -9632,14 +9642,6 @@ Modern Ember patterns including Resources for lifecycle management, ember-concur
 **Impact: HIGH (Prevents infinite render loops and improves performance)**
 
 ember-concurrency is designed for **user-initiated concurrency patterns** (debouncing, throttling, preventing double-clicks), not data loading. Use task return values, don't set tracked state inside tasks.
-
-- [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html)
-
-- [Task API](https://ember-concurrency.com/api/Task.html)
-
-- [ember-concurrency](https://ember-concurrency.com/)
-
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
 
 **Incorrect: using ember-concurrency for data loading with tracked state**
 
@@ -9883,6 +9885,8 @@ class Better extends Component {
 
 ember-concurrency is a powerful tool for **user concurrency patterns**. For data loading, use `getPromiseState` instead.
 
+Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+
 ### 10.2 Use Ember Concurrency for User Input Concurrency
 
 **Impact: HIGH (Better control of user-initiated async operations)**
@@ -10080,11 +10084,11 @@ class FormActions extends Component {
 
 - ❌ Simple async without user concurrency concerns (use async/await)
 
-See **advanced-data-loading-with-ember-concurrency.md** for correct data loading patterns.
+See [advanced-data-loading-with-ember-concurrency](references/advanced-data-loading-with-ember-concurrency.md) for correct data loading patterns.
 
 ember-concurrency provides automatic cancelation, derived state (isRunning, isIdle), and better patterns for **user-initiated** async operations.
 
-Reference: [https://ember-concurrency.com/](https://ember-concurrency.com/)
+Reference: [ember-concurrency](https://ember-concurrency.com/)
 
 ### 10.3 Use Helper Functions for Reusable Logic
 
@@ -10240,7 +10244,7 @@ export class FormatCurrencyHelper {
 
 Helpers promote code reuse, are easier to test, and keep components focused on behavior.
 
-Reference: [https://guides.emberjs.com/release/components/helper-functions/](https://guides.emberjs.com/release/components/helper-functions/)
+Reference: [Ember Helpers](https://guides.emberjs.com/release/components/helper-functions/)
 
 ### 10.4 Use Modifiers for DOM Side Effects
 
@@ -10365,7 +10369,7 @@ import onResize from 'ember-resize-observer-modifier';
 
 Modifiers provide a clean, reusable way to manage DOM side effects without coupling to specific components.
 
-Reference: [https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/)
+Reference: [Ember Modifiers](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/)
 
 ### 10.5 Use Reactive Collections from @ember/reactive/collections
 

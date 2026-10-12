@@ -52,3 +52,5 @@ export default class DashboardRoute extends Route {
 ```
 
 Using `hash()` from RSVP allows Ember to resolve all promises concurrently, significantly reducing load time.
+
+Reference: [Ember Guides: Specifying a Route's Model](https://guides.emberjs.com/release/routing/specifying-a-routes-model/), [MDN: Promise.all()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all)

@@ -77,3 +77,5 @@ Use `{{#let}}` to compute expensive values once and reuse them in the template i
 ```
 
 `{{#let}}` computes values once and caches them for the block scope, reducing redundant calculations.
+
+Reference: [Ember API: let](https://api.emberjs.com/ember/release/classes/Ember.Templates.helpers/methods/let)

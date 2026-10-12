@@ -265,7 +265,7 @@ module('Acceptance | posts', function (hooks) {
 });
 ```
 
-**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See `testing-msw-setup.md` for detailed setup instructions.
+**Note:** Use MSW (Mock Service Worker) for API mocking instead of Mirage. MSW provides better conventions and doesn't lead developers astray. See [testing-msw-setup](testing-msw-setup.md) for detailed setup instructions.
 
 **Accessibility testing:**
 

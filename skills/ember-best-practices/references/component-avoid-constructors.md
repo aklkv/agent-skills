@@ -156,7 +156,4 @@ class ComplexSetup extends Component {
 
 **Strongly discourage constructors** - they add complexity and infinite render loop risks. Use declarative class fields and getPromiseState instead.
 
-Reference:
-
-- [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/)
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)

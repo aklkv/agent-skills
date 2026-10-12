@@ -69,3 +69,5 @@ class Dashboard extends Component {
 **Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/promise` to handle slow networks and errors properly.
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
+
+Reference: [MDN: import()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import), [reactiveweb](https://reactive.nullvoxpopuli.com/)

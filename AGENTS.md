@@ -8,20 +8,20 @@ A collection of [Agent Skills](https://agentskills.io/) for Ember.js projects, c
 
 ## Editing ember-best-practices
 
-Each rule is a file in `skills/ember-best-practices/rules/`. Its filename prefix places it in a section that `rules/_sections.md` defines (`route-`, `component-`, `a11y-` and so on). Start a new rule from `rules/_template.md`.
+Each rule is a file in `skills/ember-best-practices/references/`. Its filename prefix places it in a section that `references/_sections.md` defines (`route-`, `component-`, `a11y-` and so on). Start a new rule from `references/_template.md`.
 
 `skills/ember-best-practices/AGENTS.md` is generated from the rules, so don't edit it by hand:
 
 ```bash
-pnpm validate # checks that the rule files follow the template
-pnpm build    # regenerates AGENTS.md
+pnpm validate # checks the rule files against the template, that SKILL.md links each one, and that each links its documentation
+pnpm build    # regenerates AGENTS.md and the build package's test-cases.json
 ```
 
 To bump the skill's version too, run the build script with `--upgrade-version`; it updates `metadata.json` and `SKILL.md`.
 
 Then update `skills/ember-best-practices.zip` (see "Creating the Zip Package" below).
 
-CI runs `pnpm validate`, `pnpm build`, `pnpm lint:format` (Prettier) and the `skills-lint` package, which checks that skills only use allow-listed shell commands.
+CI runs `pnpm validate` and `pnpm build`, and fails if the build changes any file, so commit what it regenerates. It also runs `pnpm lint:format` (Prettier) and the `skills-lint` package, which checks that skills only use allow-listed shell commands.
 
 ## Creating a New Skill
 

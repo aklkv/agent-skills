@@ -195,11 +195,6 @@ ember-concurrency provides a powerful derived data API through Task and TaskInst
 
 This follows the **derived data pattern** - all state comes from the task itself, no tracked properties needed!
 
-References:
-
-- [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html)
-- [Task API](https://ember-concurrency.com/api/Task.html)
-
 **Migration from tracked state pattern:**
 
 ```glimmer-js
@@ -237,7 +232,4 @@ class Better extends Component {
 
 ember-concurrency is a powerful tool for **user concurrency patterns**. For data loading, use `getPromiseState` instead.
 
-Reference:
-
-- [ember-concurrency](https://ember-concurrency.com/)
-- [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)

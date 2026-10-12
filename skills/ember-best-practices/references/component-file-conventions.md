@@ -211,6 +211,6 @@ export class ProfileCard extends Component {
 
 ## Related Rules
 
-- component-use-glimmer.md - Modern Glimmer component patterns
-- component-strict-mode.md - Template-only components and strict mode
-- route-templates.md - Route file naming conventions
+- [component-use-glimmer](component-use-glimmer.md) - Modern Glimmer component patterns
+- [component-strict-mode](component-strict-mode.md) - Template-only components and strict mode
+- [route-templates](route-templates.md) - Route file naming conventions
