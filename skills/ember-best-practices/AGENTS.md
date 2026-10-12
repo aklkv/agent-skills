@@ -3853,7 +3853,7 @@ Glint checks every invocation against the signature of the component, helper or 
 ```glimmer-ts
 // app/components/user-list.gts
 import Component from '@glimmer/component';
-import UserCard from './user-card';
+import { UserCard } from './user-card';
 
 type Args = {
   users: any[];
@@ -3869,7 +3869,7 @@ interface Signature {
   };
 }
 
-export default class UserList extends Component<Signature> {
+export class UserList extends Component<Signature> {
   <template>
     <ul>
       {{#each @users as |user|}}
@@ -3888,7 +3888,7 @@ export default class UserList extends Component<Signature> {
 // app/components/user-list.gts
 import Component from '@glimmer/component';
 import type { WithBoundArgs } from '@glint/template';
-import UserCard, { type User } from './user-card';
+import { UserCard, type User } from './user-card';
 
 export interface UserListSignature {
   Args: {
@@ -3902,7 +3902,7 @@ export interface UserListSignature {
   };
 }
 
-export default class UserList extends Component<UserListSignature> {
+export class UserList extends Component<UserListSignature> {
   <template>
     <ul ...attributes>
       {{#each @users as |user index|}}
@@ -3930,7 +3930,7 @@ export default class UserList extends Component<UserListSignature> {
 ```glimmer-ts
 // app/components/primary-button.gts
 import type { TOC } from '@ember/component/template-only';
-import Button, { type ButtonSignature } from './button';
+import { Button, type ButtonSignature } from './button';
 
 export interface PrimaryButtonSignature {
   Args: {
@@ -3942,11 +3942,9 @@ export interface PrimaryButtonSignature {
   };
 }
 
-const PrimaryButton: TOC<PrimaryButtonSignature> = <template>
+export const PrimaryButton: TOC<PrimaryButtonSignature> = <template>
   <Button @kind="primary" @size={{@size}} ...attributes>{{yield}}</Button>
 </template>;
-
-export default PrimaryButton;
 ```
 
 Template-only components take the same signature through `TOC`. Deriving `Element` and individual args from `ButtonSignature` keeps the wrapper in step when `Button` changes. `Blocks` still lists only what this template yields.

@@ -499,7 +499,7 @@
     "ruleId": "",
     "ruleTitle": "Write Precise Signatures for Components, Helpers and Modifiers",
     "type": "bad",
-    "code": "// app/components/user-list.gts\nimport Component from '@glimmer/component';\nimport UserCard from './user-card';\n\ntype Args = {\n  users: any[];\n  onSelect: Function;\n};\n\ninterface Signature {\n  Args: Args;\n  Element: null;\n  Blocks: {\n    default: [any];\n    empty: [];\n  };\n}\n\nexport default class UserList extends Component<Signature> {\n  <template>\n    <ul>\n      {{#each @users as |user|}}\n        <li>{{yield (component UserCard user=user onSelect=@onSelect)}}</li>\n      {{/each}}\n    </ul>\n  </template>\n}",
+    "code": "// app/components/user-list.gts\nimport Component from '@glimmer/component';\nimport { UserCard } from './user-card';\n\ntype Args = {\n  users: any[];\n  onSelect: Function;\n};\n\ninterface Signature {\n  Args: Args;\n  Element: null;\n  Blocks: {\n    default: [any];\n    empty: [];\n  };\n}\n\nexport class UserList extends Component<Signature> {\n  <template>\n    <ul>\n      {{#each @users as |user|}}\n        <li>{{yield (component UserCard user=user onSelect=@onSelect)}}</li>\n      {{/each}}\n    </ul>\n  </template>\n}",
     "language": "glimmer-ts",
     "description": "loose types that don't match the template"
   },
@@ -507,7 +507,7 @@
     "ruleId": "",
     "ruleTitle": "Write Precise Signatures for Components, Helpers and Modifiers",
     "type": "good",
-    "code": "// app/components/user-list.gts\nimport Component from '@glimmer/component';\nimport type { WithBoundArgs } from '@glint/template';\nimport UserCard, { type User } from './user-card';\n\nexport interface UserListSignature {\n  Args: {\n    users: User[];\n    /** Called with the user whose card was clicked. */\n    onSelect: (user: User) => void;\n  };\n  Element: HTMLUListElement;\n  Blocks: {\n    default: [UserCard: WithBoundArgs<typeof UserCard, 'user' | 'onSelect'>, index: number];\n  };\n}\n\nexport default class UserList extends Component<UserListSignature> {\n  <template>\n    <ul ...attributes>\n      {{#each @users as |user index|}}\n        <li>{{yield (component UserCard user=user onSelect=@onSelect) index}}</li>\n      {{/each}}\n    </ul>\n  </template>\n}",
+    "code": "// app/components/user-list.gts\nimport Component from '@glimmer/component';\nimport type { WithBoundArgs } from '@glint/template';\nimport { UserCard, type User } from './user-card';\n\nexport interface UserListSignature {\n  Args: {\n    users: User[];\n    /** Called with the user whose card was clicked. */\n    onSelect: (user: User) => void;\n  };\n  Element: HTMLUListElement;\n  Blocks: {\n    default: [UserCard: WithBoundArgs<typeof UserCard, 'user' | 'onSelect'>, index: number];\n  };\n}\n\nexport class UserList extends Component<UserListSignature> {\n  <template>\n    <ul ...attributes>\n      {{#each @users as |user index|}}\n        <li>{{yield (component UserCard user=user onSelect=@onSelect) index}}</li>\n      {{/each}}\n    </ul>\n  </template>\n}",
     "language": "glimmer-ts",
     "description": "an exported interface that matches the template"
   },
@@ -515,7 +515,7 @@
     "ruleId": "",
     "ruleTitle": "Write Precise Signatures for Components, Helpers and Modifiers",
     "type": "good",
-    "code": "// app/components/primary-button.gts\nimport type { TOC } from '@ember/component/template-only';\nimport Button, { type ButtonSignature } from './button';\n\nexport interface PrimaryButtonSignature {\n  Args: {\n    size?: ButtonSignature['Args']['size'];\n  };\n  Element: ButtonSignature['Element'];\n  Blocks: {\n    default: [];\n  };\n}\n\nconst PrimaryButton: TOC<PrimaryButtonSignature> = <template>\n  <Button @kind=\"primary\" @size={{@size}} ...attributes>{{yield}}</Button>\n</template>;\n\nexport default PrimaryButton;",
+    "code": "// app/components/primary-button.gts\nimport type { TOC } from '@ember/component/template-only';\nimport { Button, type ButtonSignature } from './button';\n\nexport interface PrimaryButtonSignature {\n  Args: {\n    size?: ButtonSignature['Args']['size'];\n  };\n  Element: ButtonSignature['Element'];\n  Blocks: {\n    default: [];\n  };\n}\n\nexport const PrimaryButton: TOC<PrimaryButtonSignature> = <template>\n  <Button @kind=\"primary\" @size={{@size}} ...attributes>{{yield}}</Button>\n</template>;",
     "language": "glimmer-ts",
     "description": "a wrapper derives its signature from the component it wraps"
   },
