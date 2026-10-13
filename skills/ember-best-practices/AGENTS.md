@@ -37,18 +37,19 @@ Comprehensive performance optimization and accessibility guide for Ember.js appl
    - 3.4 [Avoid Unnecessary Tracking](#34-avoid-unnecessary-tracking)
    - 3.5 [Build Reactive Chains with Dependent Getters](#35-build-reactive-chains-with-dependent-getters)
    - 3.6 [Component File Naming and Export Conventions](#36-component-file-naming-and-export-conventions)
-   - 3.7 [Prefer Named Exports, Fallback to Default for Implicit Template Lookup](#37-prefer-named-exports-fallback-to-default-for-implicit-template-lookup)
-   - 3.8 [Prevent Memory Leaks in Components](#38-prevent-memory-leaks-in-components)
-   - 3.9 [Use {{on}} Modifier for Event Handling](#39-use-on-modifier-for-event-handling)
-   - 3.10 [Use @cached for Expensive Getters](#310-use-cached-for-expensive-getters)
-   - 3.11 [Use Class Fields for Component Composition](#311-use-class-fields-for-component-composition)
-   - 3.12 [Use Component Composition Patterns](#312-use-component-composition-patterns)
-   - 3.13 [Use Glimmer Components Over Classic Components](#313-use-glimmer-components-over-classic-components)
-   - 3.14 [Use Native Forms with Platform Validation](#314-use-native-forms-with-platform-validation)
-   - 3.15 [Use Strict Mode and Template-Only Components](#315-use-strict-mode-and-template-only-components)
-   - 3.16 [Use Tracked Collections for Complex State](#316-use-tracked-collections-for-complex-state)
-   - 3.17 [Validate Component Arguments](#317-validate-component-arguments)
-   - 3.18 [Write Precise Signatures for Components, Helpers and Modifiers](#318-write-precise-signatures-for-components-helpers-and-modifiers)
+   - 3.7 [Keep App State on Classes, Not in Standalone tracked() Values](#37-keep-app-state-on-classes-not-in-standalone-tracked-values)
+   - 3.8 [Prefer Named Exports, Fallback to Default for Implicit Template Lookup](#38-prefer-named-exports-fallback-to-default-for-implicit-template-lookup)
+   - 3.9 [Prevent Memory Leaks in Components](#39-prevent-memory-leaks-in-components)
+   - 3.10 [Use {{on}} Modifier for Event Handling](#310-use-on-modifier-for-event-handling)
+   - 3.11 [Use @cached for Expensive Getters](#311-use-cached-for-expensive-getters)
+   - 3.12 [Use Class Fields for Component Composition](#312-use-class-fields-for-component-composition)
+   - 3.13 [Use Component Composition Patterns](#313-use-component-composition-patterns)
+   - 3.14 [Use Glimmer Components Over Classic Components](#314-use-glimmer-components-over-classic-components)
+   - 3.15 [Use Native Forms with Platform Validation](#315-use-native-forms-with-platform-validation)
+   - 3.16 [Use Strict Mode and Template-Only Components](#316-use-strict-mode-and-template-only-components)
+   - 3.17 [Use Tracked Collections for Complex State](#317-use-tracked-collections-for-complex-state)
+   - 3.18 [Validate Component Arguments](#318-validate-component-arguments)
+   - 3.19 [Write Precise Signatures for Components, Helpers and Modifiers](#319-write-precise-signatures-for-components-helpers-and-modifiers)
 4. [Accessibility Best Practices](#4-accessibility-best-practices) — **HIGH**
    - 4.1 [Announce Route Transitions to Screen Readers](#41-announce-route-transitions-to-screen-readers)
    - 4.2 [Form Labels and Error Announcements](#42-form-labels-and-error-announcements)
@@ -2043,7 +2044,80 @@ export class ProfileCard extends Component {
 
 - [route-templates](references/route-templates.md) - Route file naming conventions
 
-### 3.7 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
+### 3.7 Keep App State on Classes, Not in Standalone tracked() Values
+
+**Impact: MEDIUM (Keeps state per instance, or in a service, rather than in module scope)**
+
+Since Ember 7.3, `tracked` from `@glimmer/tracking` can also be called as a function: `tracked(0)` returns a reactive value that's read and written through `.value`. It doesn't replace `@tracked` fields. App state still belongs on a class: a component's `@tracked` fields, so each instance gets its own, or a service for state that's shared ([service-shared-state](references/service-shared-state.md)). Use the function form only in code with no class to hold the value, such as tests and demos.
+
+**Incorrect: a template-only component keeps its state in module scope**
+
+```glimmer-js
+// app/components/counter.gjs
+import { tracked } from '@glimmer/tracking';
+
+const count = tracked(0);
+const increment = () => count.value++;
+
+export const Counter = <template>
+  <button type="button" {{on "click" increment}}>{{count.value}}</button>
+</template>;
+```
+
+`count` lives in the module, so every `<Counter />` on the page shares one count.
+
+**Correct: component state in a `@tracked` field**
+
+```glimmer-js
+// app/components/counter.gjs
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+
+export class Counter extends Component {
+  @tracked count = 0;
+
+  increment = () => this.count++;
+
+  <template>
+    <button type="button" {{on "click" this.increment}}>{{this.count}}</button>
+  </template>
+}
+```
+
+**Correct: a tracked value for a test's state**
+
+```glimmer-js
+// tests/integration/components/name-tag-test.gjs
+import { module, test } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import { render, settled } from '@ember/test-helpers';
+import { tracked } from '@glimmer/tracking';
+import { NameTag } from 'my-app/components/name-tag';
+
+module('Integration | Component | name-tag', function (hooks) {
+  setupRenderingTest(hooks);
+
+  test('it shows the new name', async function (assert) {
+    const name = tracked('Ada');
+
+    await render(<template><NameTag @name={{name.value}} data-test-name-tag /></template>);
+    name.value = 'Grace';
+    await settled();
+
+    assert.dom('[data-test-name-tag]').includesText('Grace');
+  });
+});
+```
+
+Before 7.3, a test needed a class with a `@tracked` field, or a `trackedObject`, to hold a single value.
+
+- **Equality:** writing an equal value to a `tracked()` value doesn't notify anything (it compares with `Object.is`), so mutating an array or object in `.value` and assigning it back does nothing. Assign a new array or object, or use a tracked collection ([component-tracked-toolbox](references/component-tracked-toolbox.md)). A `@tracked` field still notifies on every write unless it's declared `@tracked({ equals: Object.is })`.
+
+- **Older versions:** before Ember 7.3, `tracked` is only a decorator.
+
+Reference: [Ember 7.3 Released](https://blog.emberjs.com/ember-released-7-3/), [RFC #1071](https://github.com/emberjs/rfcs/pull/1071), [Ember API: tracked](https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/tracked)
+
+### 3.8 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
 
 **Impact: LOW (Clear export contracts across .hbs and template-tag codebases)**
 
@@ -2208,7 +2282,7 @@ This is an explicit registration escape hatch and does not replace default-expor
 
 - [ember-resolver](https://github.com/ember-cli/ember-resolver)
 
-### 3.8 Prevent Memory Leaks in Components
+### 3.9 Prevent Memory Leaks in Components
 
 **Impact: HIGH (Avoid memory leaks and resource exhaustion)**
 
@@ -2423,7 +2497,7 @@ Always clean up timers, event listeners, subscriptions, and pending requests to 
 
 Reference: [Ember Destroyable](https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable)
 
-### 3.9 Use {{on}} Modifier for Event Handling
+### 3.10 Use {{on}} Modifier for Event Handling
 
 **Impact: MEDIUM (Better memory management and clarity)**
 
@@ -2547,7 +2621,7 @@ The `{{on}}` modifier properly cleans up event listeners, supports event options
 
 Reference: [Ember Modifiers - on](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_event-handlers)
 
-### 3.10 Use @cached for Expensive Getters
+### 3.11 Use @cached for Expensive Getters
 
 **Impact: HIGH (50-90% reduction in recomputation)**
 
@@ -2596,7 +2670,7 @@ class DataTable extends Component {
 
 Reference: [@cached decorator](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/#toc_caching)
 
-### 3.11 Use Class Fields for Component Composition
+### 3.12 Use Class Fields for Component Composition
 
 **Impact: MEDIUM-HIGH (Better composition and initialization patterns)**
 
@@ -2916,7 +2990,7 @@ Class fields provide clean composition patterns, better initialization, and shar
 
 Reference: [JavaScript Class Fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields)
 
-### 3.12 Use Component Composition Patterns
+### 3.13 Use Component Composition Patterns
 
 **Impact: HIGH (Better code reuse and maintainability)**
 
@@ -3153,7 +3227,7 @@ Component composition provides flexibility, reusability, and clean separation of
 
 Reference: [Ember Components - Block Parameters](https://guides.emberjs.com/release/components/block-content/)
 
-### 3.13 Use Glimmer Components Over Classic Components
+### 3.14 Use Glimmer Components Over Classic Components
 
 **Impact: HIGH (30-50% faster rendering)**
 
@@ -3205,7 +3279,7 @@ Glimmer components are 30-50% faster, have cleaner APIs, and integrate better wi
 
 Reference: [Glimmer Components](https://guides.emberjs.com/release/components/component-state-and-actions/)
 
-### 3.14 Use Native Forms with Platform Validation
+### 3.15 Use Native Forms with Platform Validation
 
 **Impact: HIGH (Reduces JavaScript form complexity and improves built-in a11y)**
 
@@ -3527,7 +3601,7 @@ Use controlled patterns when you need real-time interactivity that isn't form su
 
 - [Ember Guides: Event Handling](https://guides.emberjs.com/release/components/component-state-and-actions/)
 
-### 3.15 Use Strict Mode and Template-Only Components
+### 3.16 Use Strict Mode and Template-Only Components
 
 **Impact: HIGH (Better type safety and simpler components)**
 
@@ -3609,7 +3683,7 @@ Template-only components are lighter, more performant, and easier to understand.
 
 Reference: [Ember Strict Mode](https://guides.emberjs.com/release/upgrading/current-edition/templates/)
 
-### 3.16 Use Tracked Collections for Complex State
+### 3.17 Use Tracked Collections for Complex State
 
 **Impact: HIGH (Cleaner state management)**
 
@@ -3673,7 +3747,7 @@ Tracked collections provide fine-grained reactivity and better performance than 
 
 Reference: [RFC #1068: Tracked Collections](https://rfcs.emberjs.com/id/1068-tracked-collections/)
 
-### 3.17 Validate Component Arguments
+### 3.18 Validate Component Arguments
 
 **Impact: MEDIUM (Better error messages and type safety)**
 
@@ -3843,7 +3917,7 @@ Argument validation provides better error messages during development, serves as
 
 Reference: [TypeScript in Ember](https://guides.emberjs.com/release/typescript/)
 
-### 3.18 Write Precise Signatures for Components, Helpers and Modifiers
+### 3.19 Write Precise Signatures for Components, Helpers and Modifiers
 
 **Impact: MEDIUM (Type-checked invocations and accurate editor completions)**
 
