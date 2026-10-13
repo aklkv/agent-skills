@@ -124,6 +124,7 @@ Reference these guidelines when:
 ### 10. Advanced Patterns (MEDIUM-HIGH)
 
 - [advanced-modifiers](references/advanced-modifiers.md) - Use modifiers for DOM side effects
+- [advanced-modifier-reruns](references/advanced-modifier-reruns.md) - Keep expensive modifier setup separate from updates
 - [advanced-helpers](references/advanced-helpers.md) - Extract reusable logic into helpers
 - [advanced-tracked-built-ins](references/advanced-tracked-built-ins.md) - Use reactive collections from @ember/reactive/collections
 - [advanced-concurrency](references/advanced-concurrency.md) - Use ember-concurrency for task management

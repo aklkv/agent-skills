@@ -85,11 +85,12 @@ Comprehensive performance optimization and accessibility guide for Ember.js appl
 9. [Tooling and Configuration](#9-tooling-and-configuration) — **MEDIUM**
    - 9.1 [VSCode Extensions and MCP Configuration for Ember Projects](#91-vscode-extensions-and-mcp-configuration-for-ember-projects)
 10. [Advanced Patterns](#10-advanced-patterns) — **MEDIUM-HIGH**
-   - 10.1 [Use Ember Concurrency Correctly - User Concurrency Not Data Loading](#101-use-ember-concurrency-correctly---user-concurrency-not-data-loading)
-   - 10.2 [Use Ember Concurrency for User Input Concurrency](#102-use-ember-concurrency-for-user-input-concurrency)
-   - 10.3 [Use Helper Functions for Reusable Logic](#103-use-helper-functions-for-reusable-logic)
-   - 10.4 [Use Modifiers for DOM Side Effects](#104-use-modifiers-for-dom-side-effects)
-   - 10.5 [Use Reactive Collections from @ember/reactive/collections](#105-use-reactive-collections-from-emberreactivecollections)
+   - 10.1 [Keep Expensive Modifier Setup Separate from Updates](#101-keep-expensive-modifier-setup-separate-from-updates)
+   - 10.2 [Use Ember Concurrency Correctly - User Concurrency Not Data Loading](#102-use-ember-concurrency-correctly---user-concurrency-not-data-loading)
+   - 10.3 [Use Ember Concurrency for User Input Concurrency](#103-use-ember-concurrency-for-user-input-concurrency)
+   - 10.4 [Use Helper Functions for Reusable Logic](#104-use-helper-functions-for-reusable-logic)
+   - 10.5 [Use Modifiers for DOM Side Effects](#105-use-modifiers-for-dom-side-effects)
+   - 10.6 [Use Reactive Collections from @ember/reactive/collections](#106-use-reactive-collections-from-emberreactivecollections)
 
 ---
 
@@ -9878,7 +9879,84 @@ Ensure your `tsconfig.json` has Glint configuration:
 
 Modern Ember patterns including Resources for lifecycle management, ember-concurrency for async operations, modifiers for DOM side effects, helpers for reusable logic, and comprehensive testing patterns with render strategies.
 
-### 10.1 Use Ember Concurrency Correctly - User Concurrency Not Data Loading
+### 10.1 Keep Expensive Modifier Setup Separate from Updates
+
+**Impact: MEDIUM-HIGH (Stops editors, charts and players from being rebuilt on every change)**
+
+A function-based modifier tracks everything it reads while it runs: its arguments and any tracked state. When any of it changes, the modifier calls its teardown and runs again from the start. That's cheap for an event listener, but a modifier that creates an editor, a chart or a media player rebuilds it on every change, losing focus, cursor position and undo history.
+
+It can rerun even when nothing changed: setting a tracked property invalidates it although the new value equals the old one, so a parent that writes the same value back reruns the modifier. Since Ember 7.3 a property can opt out with `@tracked({ equals: Object.is })`, but a component can't count on its parent doing so.
+
+**Incorrect: the editor is rebuilt on every keystroke**
+
+```glimmer-js
+// app/components/code-editor.gjs
+import { modifier } from 'ember-modifier';
+import { createEditor } from 'some-editor';
+
+const editor = modifier((element, [value, onChange]) => {
+  const instance = createEditor(element, { value });
+  instance.on('change', () => onChange(instance.getValue()));
+  return () => instance.destroy();
+});
+
+export const CodeEditor = <template>
+  <div {{editor @value @onChange}}></div>
+</template>;
+```
+
+Each edit calls `@onChange`, the parent updates `@value`, and the modifier destroys the editor and creates a new one.
+
+**Correct: set up once, then apply changes in place**
+
+```glimmer-js
+// app/components/code-editor.gjs
+import Component from '@glimmer/component';
+import { modifier } from 'ember-modifier';
+import { createEditor } from 'some-editor';
+
+export class CodeEditor extends Component {
+  // Read once, when the component is created
+  initialValue = this.args.value;
+  editor;
+  syncing = false;
+
+  // Reads no tracked state while it runs, so it runs once per element
+  setupEditor = modifier((element) => {
+    this.editor = createEditor(element, { value: this.initialValue });
+    this.editor.on('change', () => {
+      // Report the user's edits, not values applied by syncValue
+      if (!this.syncing) this.args.onChange(this.editor.getValue());
+    });
+    return () => this.editor.destroy();
+  });
+
+  // Reruns whenever @value is set, and only touches the editor when it differs
+  syncValue = modifier((element, [value]) => {
+    if (this.editor.getValue() !== value) {
+      this.syncing = true;
+      this.editor.setValue(value);
+      this.syncing = false;
+    }
+  });
+
+  <template>
+    <div {{this.setupEditor}} {{this.syncValue @value}}></div>
+  </template>
+}
+```
+
+- **Setup reads nothing that changes.** It reads `this.initialValue`, a plain field, and reads `@onChange` only when the editor fires an event, after the modifier has run.
+
+- **Updates are cheap and compare first.** A rerun with an unchanged value does nothing. Many editors fire their change event from `setValue()` too, so `syncing` keeps a value the parent set from being reported back as an edit.
+
+- **Order:** modifiers on one element install in the order they're written, so `this.editor` exists when `syncValue` first runs.
+
+A class-based modifier can do the same in `modify()`: create the instance on the first call, keep it in a field, and update it on later calls, like the chart modifier in [advanced-modifiers](references/advanced-modifiers.md).
+
+Reference: [ember-modifier](https://github.com/ember-modifier/ember-modifier), [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+
+### 10.2 Use Ember Concurrency Correctly - User Concurrency Not Data Loading
 
 **Impact: HIGH (Prevents infinite render loops and improves performance)**
 
@@ -10128,7 +10206,7 @@ ember-concurrency is a powerful tool for **user concurrency patterns**. For data
 
 Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
 
-### 10.2 Use Ember Concurrency for User Input Concurrency
+### 10.3 Use Ember Concurrency for User Input Concurrency
 
 **Impact: HIGH (Better control of user-initiated async operations)**
 
@@ -10331,7 +10409,7 @@ ember-concurrency provides automatic cancelation, derived state (isRunning, isId
 
 Reference: [ember-concurrency](https://ember-concurrency.com/)
 
-### 10.3 Use Helper Functions for Reusable Logic
+### 10.4 Use Helper Functions for Reusable Logic
 
 **Impact: LOW-MEDIUM (Better code reuse and testability)**
 
@@ -10487,7 +10565,7 @@ Helpers promote code reuse, are easier to test, and keep components focused on b
 
 Reference: [Ember Helpers](https://guides.emberjs.com/release/components/helper-functions/)
 
-### 10.4 Use Modifiers for DOM Side Effects
+### 10.5 Use Modifiers for DOM Side Effects
 
 **Impact: LOW-MEDIUM (Better separation of concerns)**
 
@@ -10536,6 +10614,8 @@ export default modifier((element, [config]) => {
 });
 ```
 
+This rebuilds the chart whenever `config` changes. When it changes often, update the chart in place instead, as the class-based modifier below does ([advanced-modifier-reruns](references/advanced-modifier-reruns.md)).
+
 **Also correct: class-based modifier for complex state**
 
 ```javascript
@@ -10546,18 +10626,23 @@ import { registerDestructor } from '@ember/destroyable';
 export default class ChartModifier extends Modifier {
   chartInstance = null;
 
-  modify(element, [config]) {
-    // Cleanup previous instance if config changed
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-    }
-
-    this.chartInstance = new Chart(element, config);
-
-    // Register cleanup
+  constructor(owner, args) {
+    super(owner, args);
+    // Register cleanup once, not on every modify()
     registerDestructor(this, () => {
       this.chartInstance?.destroy();
     });
+  }
+
+  modify(element, [config]) {
+    if (this.chartInstance) {
+      // Update the existing chart instead of rebuilding it
+      this.chartInstance.data = config.data;
+      this.chartInstance.options = config.options;
+      this.chartInstance.update();
+    } else {
+      this.chartInstance = new Chart(element, config);
+    }
   }
 }
 ```
@@ -10612,7 +10697,7 @@ Modifiers provide a clean, reusable way to manage DOM side effects without coupl
 
 Reference: [Ember Modifiers](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/)
 
-### 10.5 Use Reactive Collections from @ember/reactive/collections
+### 10.6 Use Reactive Collections from @ember/reactive/collections
 
 **Impact: HIGH (Enables reactive arrays, maps, and sets)**
 
