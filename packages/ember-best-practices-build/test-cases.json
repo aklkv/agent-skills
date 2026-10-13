@@ -161,6 +161,22 @@
   },
   {
     "ruleId": "",
+    "ruleTitle": "Keep Expensive Modifier Setup Separate from Updates",
+    "type": "bad",
+    "code": "// app/components/code-editor.gjs\nimport { modifier } from 'ember-modifier';\nimport { createEditor } from 'some-editor';\n\nconst editor = modifier((element, [value, onChange]) => {\n  const instance = createEditor(element, { value });\n  instance.on('change', () => onChange(instance.getValue()));\n  return () => instance.destroy();\n});\n\nexport const CodeEditor = <template>\n  <div {{editor @value @onChange}}></div>\n</template>;",
+    "language": "glimmer-js",
+    "description": "the editor is rebuilt on every keystroke"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Keep Expensive Modifier Setup Separate from Updates",
+    "type": "good",
+    "code": "// app/components/code-editor.gjs\nimport Component from '@glimmer/component';\nimport { modifier } from 'ember-modifier';\nimport { createEditor } from 'some-editor';\n\nexport class CodeEditor extends Component {\n  // Read once, when the component is created\n  initialValue = this.args.value;\n  editor;\n  syncing = false;\n\n  // Reads no tracked state while it runs, so it runs once per element\n  setupEditor = modifier((element) => {\n    this.editor = createEditor(element, { value: this.initialValue });\n    this.editor.on('change', () => {\n      // Report the user's edits, not values applied by syncValue\n      if (!this.syncing) this.args.onChange(this.editor.getValue());\n    });\n    return () => this.editor.destroy();\n  });\n\n  // Reruns whenever @value is set, and only touches the editor when it differs\n  syncValue = modifier((element, [value]) => {\n    if (this.editor.getValue() !== value) {\n      this.syncing = true;\n      this.editor.setValue(value);\n      this.syncing = false;\n    }\n  });\n\n  <template>\n    <div {{this.setupEditor}} {{this.syncValue @value}}></div>\n  </template>\n}",
+    "language": "glimmer-js",
+    "description": "set up once, then apply changes in place"
+  },
+  {
+    "ruleId": "",
     "ruleTitle": "Use Modifiers for DOM Side Effects",
     "type": "bad",
     "code": "// app/components/chart.gjs\nimport Component from '@glimmer/component';\n\nclass Chart extends Component {\n  chartInstance = null;\n\n  constructor() {\n    super(...arguments);\n    // Can't access element here - element doesn't exist yet!\n  }\n\n  willDestroy() {\n    super.willDestroy();\n    this.chartInstance?.destroy();\n  }\n\n  <template>\n    <canvas id=\"chart-canvas\"></canvas>\n    {{! Manual setup is error-prone and not reusable }}\n  </template>\n}",
@@ -179,7 +195,7 @@
     "ruleId": "",
     "ruleTitle": "Use Modifiers for DOM Side Effects",
     "type": "good",
-    "code": "// app/modifiers/chart.js\nimport Modifier from 'ember-modifier';\nimport { registerDestructor } from '@ember/destroyable';\n\nexport default class ChartModifier extends Modifier {\n  chartInstance = null;\n\n  modify(element, [config]) {\n    // Cleanup previous instance if config changed\n    if (this.chartInstance) {\n      this.chartInstance.destroy();\n    }\n\n    this.chartInstance = new Chart(element, config);\n\n    // Register cleanup\n    registerDestructor(this, () => {\n      this.chartInstance?.destroy();\n    });\n  }\n}\n\n// app/components/chart.gjs\nimport chart from '../modifiers/chart';\n\n<template>\n  <canvas {{chart @config}}></canvas>\n</template>",
+    "code": "// app/modifiers/chart.js\nimport Modifier from 'ember-modifier';\nimport { registerDestructor } from '@ember/destroyable';\n\nexport default class ChartModifier extends Modifier {\n  chartInstance = null;\n\n  constructor(owner, args) {\n    super(owner, args);\n    // Register cleanup once, not on every modify()\n    registerDestructor(this, () => {\n      this.chartInstance?.destroy();\n    });\n  }\n\n  modify(element, [config]) {\n    if (this.chartInstance) {\n      // Update the existing chart instead of rebuilding it\n      this.chartInstance.data = config.data;\n      this.chartInstance.options = config.options;\n      this.chartInstance.update();\n    } else {\n      this.chartInstance = new Chart(element, config);\n    }\n  }\n}\n\n// app/components/chart.gjs\nimport chart from '../modifiers/chart';\n\n<template>\n  <canvas {{chart @config}}></canvas>\n</template>",
     "language": "javascript",
     "description": "class-based modifier for complex state"
   },

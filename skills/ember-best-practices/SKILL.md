@@ -9,7 +9,7 @@ metadata:
 
 # Ember.js Best Practices
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 59 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 60 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -123,6 +123,7 @@ Reference these guidelines when:
 ### 10. Advanced Patterns (MEDIUM-HIGH)
 
 - [advanced-modifiers](references/advanced-modifiers.md) - Use modifiers for DOM side effects
+- [advanced-modifier-reruns](references/advanced-modifier-reruns.md) - Keep expensive modifier setup separate from updates
 - [advanced-helpers](references/advanced-helpers.md) - Extract reusable logic into helpers
 - [advanced-tracked-built-ins](references/advanced-tracked-built-ins.md) - Use reactive collections from @ember/reactive/collections
 - [advanced-concurrency](references/advanced-concurrency.md) - Use ember-concurrency for task management

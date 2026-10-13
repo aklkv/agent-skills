@@ -52,6 +52,8 @@ export default modifier((element, [config]) => {
 });
 ```
 
+This rebuilds the chart whenever `config` changes. When it changes often, update the chart in place instead, as the class-based modifier below does ([advanced-modifier-reruns](advanced-modifier-reruns.md)).
+
 **Also correct (class-based modifier for complex state):**
 
 ```javascript
@@ -62,18 +64,23 @@ import { registerDestructor } from '@ember/destroyable';
 export default class ChartModifier extends Modifier {
   chartInstance = null;
 
-  modify(element, [config]) {
-    // Cleanup previous instance if config changed
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-    }
-
-    this.chartInstance = new Chart(element, config);
-
-    // Register cleanup
+  constructor(owner, args) {
+    super(owner, args);
+    // Register cleanup once, not on every modify()
     registerDestructor(this, () => {
       this.chartInstance?.destroy();
     });
+  }
+
+  modify(element, [config]) {
+    if (this.chartInstance) {
+      // Update the existing chart instead of rebuilding it
+      this.chartInstance.data = config.data;
+      this.chartInstance.options = config.options;
+      this.chartInstance.update();
+    } else {
+      this.chartInstance = new Chart(element, config);
+    }
   }
 }
 ```
