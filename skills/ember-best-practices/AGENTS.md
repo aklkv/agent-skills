@@ -37,18 +37,19 @@ Comprehensive performance optimization and accessibility guide for Ember.js appl
    - 3.4 [Avoid Unnecessary Tracking](#34-avoid-unnecessary-tracking)
    - 3.5 [Build Reactive Chains with Dependent Getters](#35-build-reactive-chains-with-dependent-getters)
    - 3.6 [Component File Naming and Export Conventions](#36-component-file-naming-and-export-conventions)
-   - 3.7 [Prefer Named Exports, Fallback to Default for Implicit Template Lookup](#37-prefer-named-exports-fallback-to-default-for-implicit-template-lookup)
-   - 3.8 [Prevent Memory Leaks in Components](#38-prevent-memory-leaks-in-components)
-   - 3.9 [Use {{on}} Modifier for Event Handling](#39-use-on-modifier-for-event-handling)
-   - 3.10 [Use @cached for Expensive Getters](#310-use-cached-for-expensive-getters)
-   - 3.11 [Use Class Fields for Component Composition](#311-use-class-fields-for-component-composition)
-   - 3.12 [Use Component Composition Patterns](#312-use-component-composition-patterns)
-   - 3.13 [Use Glimmer Components Over Classic Components](#313-use-glimmer-components-over-classic-components)
-   - 3.14 [Use Native Forms with Platform Validation](#314-use-native-forms-with-platform-validation)
-   - 3.15 [Use Strict Mode and Template-Only Components](#315-use-strict-mode-and-template-only-components)
-   - 3.16 [Use Tracked Collections for Complex State](#316-use-tracked-collections-for-complex-state)
-   - 3.17 [Validate Component Arguments](#317-validate-component-arguments)
-   - 3.18 [Write Precise Signatures for Components, Helpers and Modifiers](#318-write-precise-signatures-for-components-helpers-and-modifiers)
+   - 3.7 [Don't Update Tracked State While Rendering](#37-dont-update-tracked-state-while-rendering)
+   - 3.8 [Prefer Named Exports, Fallback to Default for Implicit Template Lookup](#38-prefer-named-exports-fallback-to-default-for-implicit-template-lookup)
+   - 3.9 [Prevent Memory Leaks in Components](#39-prevent-memory-leaks-in-components)
+   - 3.10 [Use {{on}} Modifier for Event Handling](#310-use-on-modifier-for-event-handling)
+   - 3.11 [Use @cached for Expensive Getters](#311-use-cached-for-expensive-getters)
+   - 3.12 [Use Class Fields for Component Composition](#312-use-class-fields-for-component-composition)
+   - 3.13 [Use Component Composition Patterns](#313-use-component-composition-patterns)
+   - 3.14 [Use Glimmer Components Over Classic Components](#314-use-glimmer-components-over-classic-components)
+   - 3.15 [Use Native Forms with Platform Validation](#315-use-native-forms-with-platform-validation)
+   - 3.16 [Use Strict Mode and Template-Only Components](#316-use-strict-mode-and-template-only-components)
+   - 3.17 [Use Tracked Collections for Complex State](#317-use-tracked-collections-for-complex-state)
+   - 3.18 [Validate Component Arguments](#318-validate-component-arguments)
+   - 3.19 [Write Precise Signatures for Components, Helpers and Modifiers](#319-write-precise-signatures-for-components-helpers-and-modifiers)
 4. [Accessibility Best Practices](#4-accessibility-best-practices) — **HIGH**
    - 4.1 [Announce Route Transitions to Screen Readers](#41-announce-route-transitions-to-screen-readers)
    - 4.2 [Form Labels and Error Announcements](#42-form-labels-and-error-announcements)
@@ -2043,7 +2044,72 @@ export class ProfileCard extends Component {
 
 - [route-templates](references/route-templates.md) - Route file naming conventions
 
-### 3.7 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
+### 3.7 Don't Update Tracked State While Rendering
+
+**Impact: MEDIUM (Avoids backtracking assertions and stale caches)**
+
+Getters and helpers run while a template renders. If one of them writes a tracked property that the render has already read, Ember throws in development:
+
+> You attempted to update `sortedCache` on …, but it had already been used previously in the same computation.
+
+The usual cause is a lazy cache kept in a `@tracked` field: the getter reads the field, finds it empty and fills it, all in the same render.
+
+**Incorrect: a getter fills a tracked cache**
+
+```glimmer-js
+// app/components/leaderboard.gjs
+import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
+
+export class Leaderboard extends Component {
+  @tracked sortedCache;
+
+  get sorted() {
+    this.sortedCache ??= [...this.args.players].sort((a, b) => b.score - a.score);
+    return this.sortedCache;
+  }
+
+  <template>
+    {{#each this.sorted as |player|}}
+      <p>{{player.name}}: {{player.score}}</p>
+    {{/each}}
+  </template>
+}
+```
+
+Besides throwing, the cache never updates when `@players` changes.
+
+**Correct: derive the value with `@cached`**
+
+```glimmer-js
+// app/components/leaderboard.gjs
+import Component from '@glimmer/component';
+import { cached } from '@glimmer/tracking';
+
+export class Leaderboard extends Component {
+  // Memoized, and recomputed when @players changes
+  @cached
+  get sorted() {
+    return [...this.args.players].sort((a, b) => b.score - a.score);
+  }
+
+  <template>
+    {{#each this.sorted as |player|}}
+      <p>{{player.name}}: {{player.score}}</p>
+    {{/each}}
+  </template>
+}
+```
+
+- **Derived values** belong in getters, memoized with `@cached` when they're expensive ([component-cached-getters](references/component-cached-getters.md)).
+
+- **Values computed once per instance** that never need to re-render anything, such as an id, belong in a plain class field, which isn't tracked ([component-minimal-tracking](references/component-minimal-tracking.md)).
+
+- **Tracked state** changes in response to something that happens after rendering, such as an event handler.
+
+Reference: [Ember API: @cached](https://api.emberjs.com/ember/release/functions/@glimmer%2Ftracking/cached), [Ember Guides: Autotracking In-Depth](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+
+### 3.8 Prefer Named Exports, Fallback to Default for Implicit Template Lookup
 
 **Impact: LOW (Clear export contracts across .hbs and template-tag codebases)**
 
@@ -2208,7 +2274,7 @@ This is an explicit registration escape hatch and does not replace default-expor
 
 - [ember-resolver](https://github.com/ember-cli/ember-resolver)
 
-### 3.8 Prevent Memory Leaks in Components
+### 3.9 Prevent Memory Leaks in Components
 
 **Impact: HIGH (Avoid memory leaks and resource exhaustion)**
 
@@ -2423,7 +2489,7 @@ Always clean up timers, event listeners, subscriptions, and pending requests to 
 
 Reference: [Ember Destroyable](https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable)
 
-### 3.9 Use {{on}} Modifier for Event Handling
+### 3.10 Use {{on}} Modifier for Event Handling
 
 **Impact: MEDIUM (Better memory management and clarity)**
 
@@ -2547,7 +2613,7 @@ The `{{on}}` modifier properly cleans up event listeners, supports event options
 
 Reference: [Ember Modifiers - on](https://guides.emberjs.com/release/components/template-lifecycle-dom-and-modifiers/#toc_event-handlers)
 
-### 3.10 Use @cached for Expensive Getters
+### 3.11 Use @cached for Expensive Getters
 
 **Impact: HIGH (50-90% reduction in recomputation)**
 
@@ -2596,7 +2662,7 @@ class DataTable extends Component {
 
 Reference: [@cached decorator](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/#toc_caching)
 
-### 3.11 Use Class Fields for Component Composition
+### 3.12 Use Class Fields for Component Composition
 
 **Impact: MEDIUM-HIGH (Better composition and initialization patterns)**
 
@@ -2916,7 +2982,7 @@ Class fields provide clean composition patterns, better initialization, and shar
 
 Reference: [JavaScript Class Fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields)
 
-### 3.12 Use Component Composition Patterns
+### 3.13 Use Component Composition Patterns
 
 **Impact: HIGH (Better code reuse and maintainability)**
 
@@ -3153,7 +3219,7 @@ Component composition provides flexibility, reusability, and clean separation of
 
 Reference: [Ember Components - Block Parameters](https://guides.emberjs.com/release/components/block-content/)
 
-### 3.13 Use Glimmer Components Over Classic Components
+### 3.14 Use Glimmer Components Over Classic Components
 
 **Impact: HIGH (30-50% faster rendering)**
 
@@ -3205,7 +3271,7 @@ Glimmer components are 30-50% faster, have cleaner APIs, and integrate better wi
 
 Reference: [Glimmer Components](https://guides.emberjs.com/release/components/component-state-and-actions/)
 
-### 3.14 Use Native Forms with Platform Validation
+### 3.15 Use Native Forms with Platform Validation
 
 **Impact: HIGH (Reduces JavaScript form complexity and improves built-in a11y)**
 
@@ -3527,7 +3593,7 @@ Use controlled patterns when you need real-time interactivity that isn't form su
 
 - [Ember Guides: Event Handling](https://guides.emberjs.com/release/components/component-state-and-actions/)
 
-### 3.15 Use Strict Mode and Template-Only Components
+### 3.16 Use Strict Mode and Template-Only Components
 
 **Impact: HIGH (Better type safety and simpler components)**
 
@@ -3609,7 +3675,7 @@ Template-only components are lighter, more performant, and easier to understand.
 
 Reference: [Ember Strict Mode](https://guides.emberjs.com/release/upgrading/current-edition/templates/)
 
-### 3.16 Use Tracked Collections for Complex State
+### 3.17 Use Tracked Collections for Complex State
 
 **Impact: HIGH (Cleaner state management)**
 
@@ -3673,7 +3739,7 @@ Tracked collections provide fine-grained reactivity and better performance than 
 
 Reference: [RFC #1068: Tracked Collections](https://rfcs.emberjs.com/id/1068-tracked-collections/)
 
-### 3.17 Validate Component Arguments
+### 3.18 Validate Component Arguments
 
 **Impact: MEDIUM (Better error messages and type safety)**
 
@@ -3843,7 +3909,7 @@ Argument validation provides better error messages during development, serves as
 
 Reference: [TypeScript in Ember](https://guides.emberjs.com/release/typescript/)
 
-### 3.18 Write Precise Signatures for Components, Helpers and Modifiers
+### 3.19 Write Precise Signatures for Components, Helpers and Modifiers
 
 **Impact: MEDIUM (Type-checked invocations and accurate editor completions)**
 
