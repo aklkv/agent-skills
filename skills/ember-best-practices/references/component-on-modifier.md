@@ -16,13 +16,11 @@ Use the `{{on}}` modifier for event handling instead of traditional action handl
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     this.args.onClick?.();
-  }
+  };
 
   <template>
     <button onclick={{this.handleClick}}>

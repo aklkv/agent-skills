@@ -51,7 +51,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class DataManager extends Component {
   // Service injection as class fields
@@ -72,9 +72,9 @@ class DataManager extends Component {
   }
 
   <template>
-    {{#if this.currentUser.isFulfilled}}
+    {{#if this.currentUser.isSuccess}}
       <div>{{this.currentUser.value.name}}</div>
-    {{else if this.currentUser.isRejected}}
+    {{else if this.currentUser.isError}}
       <div>Error: {{this.currentUser.error.message}}</div>
     {{/if}}
   </template>

@@ -15,7 +15,6 @@ Create reactive chains where getters depend on other getters or tracked properti
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class ShoppingCart extends Component {
   @tracked items = [];
@@ -24,17 +23,15 @@ class ShoppingCart extends Component {
   @tracked shipping = 0;
   @tracked total = 0;
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items = [...this.items, item];
     this.recalculate();
-  }
+  };
 
-  @action
-  removeItem(index) {
+  removeItem = (index) => {
     this.items = this.items.filter((_, i) => i !== index);
     this.recalculate();
-  }
+  };
 
   recalculate() {
     this.subtotal = this.items.reduce((sum, item) => sum + item.price, 0);
@@ -59,7 +56,6 @@ class ShoppingCart extends Component {
 ```glimmer-js
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 
 class ShoppingCart extends Component {
@@ -102,17 +98,15 @@ class ShoppingCart extends Component {
     return this.total - this.discount;
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
     // All getters automatically update!
-  }
+  };
 
-  @action
-  removeItem(index) {
+  removeItem = (index) => {
     this.items.splice(index, 1);
     // All getters automatically update!
-  }
+  };
 
   <template>
     <div class="cart">

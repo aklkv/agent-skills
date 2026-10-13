@@ -20,13 +20,11 @@ Always use the `{{on}}` modifier for event handling instead of HTML event handle
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 export default class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     console.log('clicked');
-  }
+  };
 
   <template>
     <button onclick={{this.handleClick}}>
@@ -41,14 +39,12 @@ export default class Button extends Component {
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     console.log('clicked');
-  }
+  };
 
   <template>
     <button {{on "click" this.handleClick}}>
@@ -65,14 +61,12 @@ The `{{on}}` modifier supports standard event listener options:
 ```glimmer-js
 // app/components/scrollable.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Scrollable extends Component {
-  @action
-  handleScroll(event) {
+  handleScroll = (event) => {
     console.log('scrolled', event.target.scrollTop);
-  }
+  };
 
   <template>
     {{! passive: true improves scroll performance }}
@@ -94,24 +88,20 @@ export default class Scrollable extends Component {
 ```glimmer-js
 // app/components/input-field.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class InputField extends Component {
-  @action
-  handleFocus() {
+  handleFocus = () => {
     console.log('focused');
-  }
+  };
 
-  @action
-  handleBlur() {
+  handleBlur = () => {
     console.log('blurred');
-  }
+  };
 
-  @action
-  handleInput(event) {
+  handleInput = (event) => {
     this.args.onChange?.(event.target.value);
-  }
+  };
 
   <template>
     <input
@@ -132,17 +122,15 @@ Handle these in your action, not in the template:
 ```glimmer-js
 // app/components/form.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Form extends Component {
-  @action
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault(); // Prevent page reload
     event.stopPropagation(); // Stop event bubbling if needed
 
     this.args.onSubmit?.(/* form data */);
-  }
+  };
 
   <template>
     <form {{on "submit" this.handleSubmit}}>
@@ -157,12 +145,10 @@ export default class Form extends Component {
 ```glimmer-js
 // app/components/keyboard-nav.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class KeyboardNav extends Component {
-  @action
-  handleKeyDown(event) {
+  handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.args.onActivate?.();
@@ -171,7 +157,7 @@ export default class KeyboardNav extends Component {
     if (event.key === 'Escape') {
       this.args.onCancel?.();
     }
-  }
+  };
 
   <template>
     <div role="button" tabindex="0" {{on "keydown" this.handleKeyDown}}>
@@ -188,18 +174,16 @@ For lists with many items, use event delegation on the parent:
 ```glimmer-js
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class TodoList extends Component {
-  @action
-  handleClick(event) {
+  handleClick = (event) => {
     // Find which todo was clicked
     const todoId = event.target.closest('[data-todo-id]')?.dataset.todoId;
     if (todoId) {
       this.args.onTodoClick?.(todoId);
     }
-  }
+  };
 
   <template>
     {{! Single listener for all todos - better than one per item }}
@@ -216,20 +200,22 @@ export default class TodoList extends Component {
 
 ### Common Pitfalls
 
-**❌ Don't bind directly without @action:**
+**❌ Don't pass a plain method:**
 
 ```glimmer-js
-// This won't work - loses 'this' context
+myMethod() {
+  // 'this' is undefined when the click calls it
+}
+
 <button {{on "click" this.myMethod}}>Bad</button>
 ```
 
-**✅ Use @action decorator:**
+**✅ Use an arrow function:**
 
 ```glimmer-js
-@action
-myMethod() {
+myMethod = () => {
   // 'this' is correctly bound
-}
+};
 
 <button {{on "click" this.myMethod}}>Good</button>
 ```

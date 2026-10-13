@@ -48,13 +48,13 @@ class UserProfile extends Component {
 - Makes component state harder to reason about
 - Can trigger multiple re-renders
 
-**Correct (use getPromiseState from warp-drive/reactiveweb for data loading):**
+**Correct (use getPromiseState from WarpDrive for data loading):**
 
 ```glimmer-js
 // app/components/user-profile.gjs
 import Component from '@glimmer/component';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class UserProfile extends Component {
   @cached
@@ -66,9 +66,9 @@ class UserProfile extends Component {
   <template>
     {{#if this.userData.isPending}}
       <div>Loading...</div>
-    {{else if this.userData.isRejected}}
+    {{else if this.userData.isError}}
       <div>Error: {{this.userData.error.message}}</div>
-    {{else if this.userData.isFulfilled}}
+    {{else if this.userData.isSuccess}}
       <h1>{{this.userData.value.name}}</h1>
     {{/if}}
   </template>
@@ -179,7 +179,7 @@ class FormSubmit extends Component {
 - **Derive data, don't set it** - Use `task.lastSuccessful`, `task.last`, `task.isRunning` (derived from TaskInstance API)
 - **Use task return values** - Read from `task.lastSuccessful.value` or `task.last.value`, never set tracked state
 - **User-initiated only** - ember-concurrency is for handling user concurrency patterns
-- **Data loading** - Use `getPromiseState` from warp-drive/reactiveweb for non-user-initiated loading
+- **Data loading** - Use `getPromiseState` from WarpDrive (`@warp-drive/ember`) for non-user-initiated loading
 - **Avoid side effects** - Don't modify component state inside tasks that's read during render
 
 **TaskInstance API for Derived Data:**
@@ -226,10 +226,10 @@ class Better extends Component {
     return getPromiseState(fetch('/api/data').then((r) => r.json()));
   }
 
-  // template reads: {{#if this.data.isFulfilled}}{{this.data.value}}{{/if}}
+  // template reads: {{#if this.data.isSuccess}}{{this.data.value}}{{/if}}
 }
 ```
 
 ember-concurrency is a powerful tool for **user concurrency patterns**. For data loading, use `getPromiseState` instead.
 
-Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState)

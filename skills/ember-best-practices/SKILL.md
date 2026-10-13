@@ -9,7 +9,7 @@ metadata:
 
 # Ember.js Best Practices
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 60 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive performance optimization and accessibility guide for Ember.js applications. Its rules span 10 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -59,10 +59,11 @@ Reference these guidelines when:
 - [component-cached-getters](references/component-cached-getters.md) - Use @cached for expensive computations
 - [component-minimal-tracking](references/component-minimal-tracking.md) - Only track properties that affect rendering
 - [component-no-tracked-writes-in-render](references/component-no-tracked-writes-in-render.md) - Don't update tracked state while rendering
-- [component-tracked-toolbox](references/component-tracked-toolbox.md) - Use tracked-built-ins for complex state
+- [component-tracked-toolbox](references/component-tracked-toolbox.md) - Use tracked collections for complex state
 - [component-composition-patterns](references/component-composition-patterns.md) - Use yield blocks and contextual components
 - [component-reactive-chains](references/component-reactive-chains.md) - Build reactive chains with dependent getters
 - [component-class-fields](references/component-class-fields.md) - Use class fields for component composition
+- [component-standalone-tracked](references/component-standalone-tracked.md) - Keep app state on classes, not in standalone tracked() values
 - [component-controlled-forms](references/component-controlled-forms.md) - Implement controlled form patterns
 - [component-on-modifier](references/component-on-modifier.md) - Use {{on}} modifier for event handling
 - [component-args-validation](references/component-args-validation.md) - Validate component arguments
@@ -124,6 +125,7 @@ Reference these guidelines when:
 ### 10. Advanced Patterns (MEDIUM-HIGH)
 
 - [advanced-modifiers](references/advanced-modifiers.md) - Use modifiers for DOM side effects
+- [advanced-modifier-reruns](references/advanced-modifier-reruns.md) - Keep expensive modifier setup separate from updates
 - [advanced-helpers](references/advanced-helpers.md) - Extract reusable logic into helpers
 - [advanced-tracked-built-ins](references/advanced-tracked-built-ins.md) - Use reactive collections from @ember/reactive/collections
 - [advanced-concurrency](references/advanced-concurrency.md) - Use ember-concurrency for task management

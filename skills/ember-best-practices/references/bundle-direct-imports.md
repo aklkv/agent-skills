@@ -14,7 +14,6 @@ Import specific utilities and components directly rather than entire addon names
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 // OK - these are already optimized
 
 // But avoid this pattern with utility libraries:
@@ -33,7 +32,6 @@ class My extends Component {
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs'; // moment alternative, smaller
 
@@ -49,7 +47,6 @@ class My extends Component {
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { debounce } from '@ember/runloop';
 
 class My extends Component {

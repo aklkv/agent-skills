@@ -194,21 +194,18 @@ import DataTable from './data-table';
 // app/components/dropdown.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 import { hash } from '@ember/helper';
 
 class Dropdown extends Component {
   @tracked isOpen = false;
 
-  @action
-  toggle() {
+  toggle = () => {
     this.isOpen = !this.isOpen;
-  }
+  };
 
-  @action
-  close() {
+  close = () => {
     this.isOpen = false;
-  }
+  };
 
   <template>{{yield (hash isOpen=this.isOpen toggle=this.toggle close=this.close)}}</template>
 }

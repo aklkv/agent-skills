@@ -27,16 +27,14 @@ For computed values or reactive transformations, use getters and `@cached`:
 // app/components/user-greeting.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class UserGreeting extends Component {
   @tracked displayName = '';
 
-  @action
-  updateDisplayName() {
+  updateDisplayName = () => {
     // Runs on every render - inefficient and error-prone
     this.displayName = `${this.args.user.firstName} ${this.args.user.lastName}`;
-  }
+  };
 
   <template>
     <div {{did-update this.updateDisplayName @user}}>
@@ -116,15 +114,13 @@ For DOM side effects, element setup, or cleanup, use custom modifiers:
 ```glimmer-js
 // app/components/chart.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Chart extends Component {
   chartInstance = null;
 
-  @action
-  setupChart(element) {
+  setupChart = (element) => {
     this.chartInstance = new Chart(element, this.args.config);
-  }
+  };
 
   willDestroy() {
     super.willDestroy();
@@ -175,15 +171,13 @@ For complex state management with automatic cleanup, use `ember-resources`:
 // app/components/user-profile.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class UserProfile extends Component {
   @tracked userData = null;
   @tracked loading = true;
   controller = new AbortController();
 
-  @action
-  async loadUser() {
+  loadUser = async () => {
     this.loading = true;
     try {
       const response = await fetch(`/api/users/${this.args.userId}`, {
@@ -193,7 +187,7 @@ class UserProfile extends Component {
     } finally {
       this.loading = false;
     }
-  }
+  };
 
   willDestroy() {
     super.willDestroy();
@@ -300,7 +294,7 @@ Modern alternatives provide better performance:
 ### Common Pitfalls to Avoid
 
 ❌ **Don't use `willDestroy()` for cleanup when a modifier would work**
-❌ **Don't use `@action` + `did-insert` when a getter would suffice**
+❌ **Don't use a `did-insert` callback when a getter would suffice**
 ❌ **Don't manually track changes when `@cached` handles it automatically**
 ❌ **Don't forget `registerDestructor` in custom modifiers**
 
@@ -310,9 +304,9 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 - **Derived Data**: Use getters and `@cached` for reactive computations
 - **DOM Side Effects**: Use custom modifiers with `registerDestructor`
-- **Async Data Loading**: Use getPromiseState from warp-drive/reactiveweb
+- **Async Data Loading**: Use getPromiseState from WarpDrive (`@warp-drive/ember`)
 - **Better Code**: More testable, composable, and maintainable
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
-Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)

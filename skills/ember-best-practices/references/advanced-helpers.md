@@ -125,16 +125,17 @@ import { formatRelativeDate } from '../utils/format-relative-date';
 </template>
 ```
 
-**For helpers with state, use class-based helpers:**
+**For helpers that need services, extend `Helper`:**
 
 ```javascript
-// app/utils/helpers/format-currency.js
-export class FormatCurrencyHelper {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+// app/utils/format-currency.js
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(amount, { currency = 'USD' } = {}) {
+export class FormatCurrencyHelper extends Helper {
+  @service intl;
+
+  compute([amount], { currency = 'USD' }) {
     return this.intl.formatNumber(amount, {
       style: 'currency',
       currency,
@@ -142,6 +143,8 @@ export class FormatCurrencyHelper {
   }
 }
 ```
+
+A class-based helper's `compute` receives the positional arguments as an array and the named arguments as an object.
 
 **Common helpers to create:**
 
