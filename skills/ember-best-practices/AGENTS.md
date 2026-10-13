@@ -9811,7 +9811,7 @@ Modern Ember patterns including Resources for lifecycle management, ember-concur
 
 A function-based modifier tracks everything it reads while it runs: its arguments and any tracked state. When any of it changes, the modifier calls its teardown and runs again from the start. That's cheap for an event listener, but a modifier that creates an editor, a chart or a media player rebuilds it on every change, losing focus, cursor position and undo history.
 
-It can rerun even when nothing changed: setting a tracked property invalidates it although the new value equals the old one, so a parent that writes the same value back reruns the modifier.
+It can rerun even when nothing changed: setting a tracked property invalidates it although the new value equals the old one, so a parent that writes the same value back reruns the modifier. Since Ember 7.3 a property can opt out with `@tracked({ equals: Object.is })`, but a component can't count on its parent doing so.
 
 **Incorrect: the editor is rebuilt on every keystroke**
 
