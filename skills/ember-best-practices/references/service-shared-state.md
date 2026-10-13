@@ -32,21 +32,18 @@ export default class DashboardRoute extends Route {
 // app/services/theme.js
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class ThemeService extends Service {
   @tracked currentTheme = 'dark';
 
-  @action
-  setTheme(theme) {
+  setTheme = (theme) => {
     this.currentTheme = theme;
     localStorage.setItem('theme', theme);
-  }
+  };
 
-  @action
-  loadTheme() {
+  loadTheme = () => {
     this.currentTheme = localStorage.getItem('theme') || 'dark';
-  }
+  };
 }
 ```
 
@@ -84,7 +81,6 @@ import Service from '@ember/service';
 import { service } from '@ember/service';
 import { trackedArray } from '@ember/reactive/collections';
 import { cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class CartService extends Service {
   @service store;
@@ -101,18 +97,16 @@ export default class CartService extends Service {
     return this.items.length;
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
-  }
+  };
 
-  @action
-  removeItem(item) {
+  removeItem = (item) => {
     const index = this.items.indexOf(item);
     if (index > -1) {
       this.items.splice(index, 1);
     }
-  }
+  };
 }
 ```
 

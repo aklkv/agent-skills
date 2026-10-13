@@ -252,7 +252,6 @@ export class AnalyticsTracker extends Component {
 // app/components/shopping-cart/service.js
 import Service from '@ember/service';
 import { trackedArray } from '@ember/reactive/collections';
-import { action } from '@ember/object';
 
 export class CartService extends Service {
   items = trackedArray([]);
@@ -261,21 +260,18 @@ export class CartService extends Service {
     return this.items.reduce((sum, item) => sum + item.price, 0);
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
-  }
+  };
 
-  @action
-  removeItem(id) {
+  removeItem = (id) => {
     const index = this.items.findIndex((item) => item.id === id);
     if (index > -1) this.items.splice(index, 1);
-  }
+  };
 
-  @action
-  clear() {
+  clear = () => {
     this.items.clear();
-  }
+  };
 }
 ```
 
@@ -317,7 +313,6 @@ class ShoppingCart extends Component {
 
 ```javascript
 // app/utils/notification-manager.js
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 import { setOwner } from '@ember/application';
 
@@ -328,8 +323,7 @@ export class NotificationManager {
     setOwner(this, owner);
   }
 
-  @action
-  add(message, type = 'info') {
+  add = (message, type = 'info') => {
     const notification = {
       id: Math.random().toString(36),
       message,
@@ -341,13 +335,12 @@ export class NotificationManager {
 
     // Auto-dismiss after 5 seconds
     setTimeout(() => this.dismiss(notification.id), 5000);
-  }
+  };
 
-  @action
-  dismiss(id) {
+  dismiss = (id) => {
     const index = this.notifications.findIndex((n) => n.id === id);
     if (index > -1) this.notifications.splice(index, 1);
-  }
+  };
 }
 ```
 

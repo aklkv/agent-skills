@@ -27,7 +27,7 @@ class Dashboard extends Component {
 
 ```glimmer-js
 import Component from '@glimmer/component';
-import { getPromiseState } from 'reactiveweb/promise';
+import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 class Dashboard extends Component {
   // Use getPromiseState to model promise state for error/loading handling
@@ -43,11 +43,11 @@ class Dashboard extends Component {
 
   loadChart = () => {
     // Triggers lazy load, handles loading/error states automatically
-    return this.chartLoader.value;
+    return this.chartLoader.resolved;
   };
 
   highlightCode = (code) => {
-    const hljs = this.highlighterLoader.value;
+    const hljs = this.highlighterLoader.resolved;
     if (hljs) {
       return hljs.highlightAuto(code);
     }
@@ -57,16 +57,16 @@ class Dashboard extends Component {
   <template>
     {{#if this.chartLoader.isLoading}}
       <p>Loading chart library...</p>
-    {{else if this.chartLoader.isError}}
+    {{else if this.chartLoader.error}}
       <p>Error loading chart: {{this.chartLoader.error.message}}</p>
-    {{else if this.chartLoader.isResolved}}
+    {{else}}
       <canvas {{on "click" this.loadChart}}></canvas>
     {{/if}}
   </template>
 }
 ```
 
-**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/promise` to handle slow networks and errors properly.
+**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/get-promise-state` to handle slow networks and errors properly.
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
 

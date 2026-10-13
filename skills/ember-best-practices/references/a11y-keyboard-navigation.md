@@ -42,28 +42,24 @@ export default modifier((element, [selector = 'button']) => {
 // app/components/dropdown.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 import { fn } from '@ember/helper';
 import focusFirst from '../modifiers/focus-first';
 
 class Dropdown extends Component {
   @tracked isOpen = false;
 
-  @action
-  toggleMenu() {
+  toggleMenu = () => {
     this.isOpen = !this.isOpen;
-  }
+  };
 
-  @action
-  handleButtonKeyDown(event) {
+  handleButtonKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault();
       this.isOpen = true;
     }
-  }
+  };
 
-  @action
-  handleMenuKeyDown(event) {
+  handleMenuKeyDown = (event) => {
     if (event.key === 'Escape') {
       this.isOpen = false;
       // Return focus to button
@@ -74,7 +70,7 @@ class Dropdown extends Component {
       event.preventDefault();
       this.moveFocus(event.key === 'ArrowDown' ? 1 : -1);
     }
-  }
+  };
 
   moveFocus(direction) {
     const items = Array.from(document.querySelectorAll('[role="menuitem"] button'));
@@ -83,11 +79,10 @@ class Dropdown extends Component {
     items[nextIndex]?.focus();
   }
 
-  @action
-  selectOption(value) {
+  selectOption = (value) => {
     this.args.onSelect?.(value);
     this.isOpen = false;
-  }
+  };
 
   <template>
     <div class="dropdown">

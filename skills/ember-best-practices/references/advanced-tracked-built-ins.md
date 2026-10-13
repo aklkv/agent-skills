@@ -23,23 +23,20 @@ Use Ember's built-in reactive collections from `@ember/reactive/collections`.
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class TodoList extends Component {
   @tracked todos = []; // ❌ Array mutations (push, splice, etc.) won't trigger updates
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // This won't trigger a re-render!
     this.todos.push({ id: Date.now(), text });
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // This also won't trigger a re-render!
     const index = this.todos.findIndex((t) => t.id === id);
     this.todos.splice(index, 1);
-  }
+  };
 
   <template>
     <ul>
@@ -60,24 +57,21 @@ export default class TodoList extends Component {
 ```glimmer-js
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 
 export default class TodoList extends Component {
   todos = trackedArray([]); // ✅ Mutations are reactive
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // Now this triggers re-render!
     this.todos.push({ id: Date.now(), text });
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // This also triggers re-render!
     const index = this.todos.findIndex((t) => t.id === id);
     this.todos.splice(index, 1);
-  }
+  };
 
   <template>
     <ul>
@@ -100,21 +94,18 @@ Maps are useful for key-value stores with non-string keys:
 ```glimmer-js
 // app/components/user-cache.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedMap } from '@ember/reactive/collections';
 
 export default class UserCache extends Component {
   userCache = trackedMap(); // key: userId, value: userData
 
-  @action
-  cacheUser(userId, userData) {
+  cacheUser = (userId, userData) => {
     this.userCache.set(userId, userData);
-  }
+  };
 
-  @action
-  clearUser(userId) {
+  clearUser = (userId) => {
     this.userCache.delete(userId);
-  }
+  };
 
   get cachedUsers() {
     return Array.from(this.userCache.values());
@@ -138,20 +129,18 @@ Sets are useful for unique collections:
 ```glimmer-js
 // app/components/tag-selector.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedSet } from '@ember/reactive/collections';
 
 export default class TagSelector extends Component {
   selectedTags = trackedSet();
 
-  @action
-  toggleTag(tag) {
+  toggleTag = (tag) => {
     if (this.selectedTags.has(tag)) {
       this.selectedTags.delete(tag);
     } else {
       this.selectedTags.add(tag);
     }
-  }
+  };
 
   get selectedCount() {
     return this.selectedTags.size;
@@ -242,17 +231,15 @@ import { tracked } from '@glimmer/tracking';
 export default class TodoList extends Component {
   @tracked todos = [];
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // Reassignment is reactive
     this.todos = [...this.todos, { id: Date.now(), text }];
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // Reassignment is reactive
     this.todos = this.todos.filter((t) => t.id !== id);
-  }
+  };
 }
 ```
 

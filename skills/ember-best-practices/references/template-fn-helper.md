@@ -14,13 +14,11 @@ The `{{fn}}` helper is used for partial application (binding arguments), similar
 ```glimmer-js
 // app/components/search.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Search extends Component {
-  @action
-  handleSearch(event) {
+  handleSearch = (event) => {
     console.log('Searching:', event.target.value);
-  }
+  };
 
   <template>
     {{! Wrong - no arguments being bound}}
@@ -34,13 +32,11 @@ class Search extends Component {
 ```glimmer-js
 // app/components/search.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Search extends Component {
-  @action
-  handleSearch(event) {
+  handleSearch = (event) => {
     console.log('Searching:', event.target.value);
-  }
+  };
 
   <template>
     {{! Correct - pass function directly}}
@@ -56,14 +52,12 @@ Use `{{fn}}` when you need to pre-bind arguments to a function, similar to JavaS
 ```glimmer-js
 // app/components/user-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class UserList extends Component {
-  @action
-  deleteUser(userId, event) {
+  deleteUser = (userId, event) => {
     console.log('Deleting user:', userId);
     this.args.onDelete(userId);
-  }
+  };
 
   <template>
     <ul>
@@ -86,14 +80,12 @@ class UserList extends Component {
 ```glimmer-js
 // app/components/data-grid.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class DataGrid extends Component {
-  @action
-  updateCell(rowId, columnKey, event) {
+  updateCell = (rowId, columnKey, event) => {
     const newValue = event.target.value;
     this.args.onUpdate(rowId, columnKey, newValue);
-  }
+  };
 
   <template>
     {{#each @rows as |row|}}

@@ -60,23 +60,20 @@ import { LinkTo } from '@ember/routing';
 ```glimmer-js
 // app/components/custom-button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import XIcon from './x-icon';
 
 class CustomButton extends Component {
-  @action
-  handleKeyDown(event) {
+  handleKeyDown = (event) => {
     // Support Enter and Space keys for keyboard users
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.handleClick();
     }
-  }
+  };
 
-  @action
-  handleClick() {
+  handleClick = () => {
     this.args.onClick?.();
-  }
+  };
 
   <template>
     <div
