@@ -18,11 +18,14 @@ Rules are organized by prefix:
 
 - `route-` for Route Loading and Data Fetching (Section 1)
 - `bundle-` for Build and Bundle Optimization (Section 2)
-- `component-` for Component and Reactivity (Section 3)
+- `component-` and `exports-` for Component and Reactivity (Section 3)
 - `a11y-` for Accessibility Best Practices (Section 4)
 - `service-` for Service and State Management (Section 5)
-- `template-` for Template Optimization (Section 6)
-- `advanced-` for Advanced Patterns (Section 7)
+- `template-` and `helper-` for Template Optimization (Section 6)
+- `performance-` for Performance Optimization (Section 7)
+- `testing-` for Testing Best Practices (Section 8)
+- `vscode-` for Tooling and Configuration (Section 9)
+- `advanced-` for Advanced Patterns (Section 10)
 
 ## Rule File Structure
 
