@@ -607,7 +607,6 @@ Import specific utilities and components directly rather than entire addon names
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 // OK - these are already optimized
 
 // But avoid this pattern with utility libraries:
@@ -626,7 +625,6 @@ class My extends Component {
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs'; // moment alternative, smaller
 
@@ -642,7 +640,6 @@ class My extends Component {
 ```javascript
 import { tracked } from '@glimmer/tracking';
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { debounce } from '@ember/runloop';
 
 class My extends Component {
@@ -680,7 +677,7 @@ class Dashboard extends Component {
 
 ```glimmer-js
 import Component from '@glimmer/component';
-import { getPromiseState } from 'reactiveweb/promise';
+import { getPromiseState } from 'reactiveweb/get-promise-state';
 
 class Dashboard extends Component {
   // Use getPromiseState to model promise state for error/loading handling
@@ -696,11 +693,11 @@ class Dashboard extends Component {
 
   loadChart = () => {
     // Triggers lazy load, handles loading/error states automatically
-    return this.chartLoader.value;
+    return this.chartLoader.resolved;
   };
 
   highlightCode = (code) => {
-    const hljs = this.highlighterLoader.value;
+    const hljs = this.highlighterLoader.resolved;
     if (hljs) {
       return hljs.highlightAuto(code);
     }
@@ -710,16 +707,16 @@ class Dashboard extends Component {
   <template>
     {{#if this.chartLoader.isLoading}}
       <p>Loading chart library...</p>
-    {{else if this.chartLoader.isError}}
+    {{else if this.chartLoader.error}}
       <p>Error loading chart: {{this.chartLoader.error.message}}</p>
-    {{else if this.chartLoader.isResolved}}
+    {{else}}
       <canvas {{on "click" this.loadChart}}></canvas>
     {{/if}}
   </template>
 }
 ```
 
-**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/promise` to handle slow networks and errors properly.
+**Note**: Always model promise state (loading/error/resolved) using `getPromiseState` from `reactiveweb/get-promise-state` to handle slow networks and errors properly.
 
 Dynamic imports reduce initial bundle size by 30-50%, improving Time to Interactive.
 
@@ -966,7 +963,7 @@ Very rarely, you might need a constructor for truly exceptional cases. Even then
 
 **Strongly discourage constructors** - they add complexity and infinite render loop risks. Use declarative class fields and getPromiseState instead.
 
-Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [Ember Octane Guide](https://guides.emberjs.com/release/upgrading/current-edition/), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [WarpDrive: getRequestState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getRequestState)
 
 ### 3.2 Avoid CSS Classes in Learning Examples
 
@@ -1179,16 +1176,14 @@ For computed values or reactive transformations, use getters and `@cached`:
 // app/components/user-greeting.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class UserGreeting extends Component {
   @tracked displayName = '';
 
-  @action
-  updateDisplayName() {
+  updateDisplayName = () => {
     // Runs on every render - inefficient and error-prone
     this.displayName = `${this.args.user.firstName} ${this.args.user.lastName}`;
-  }
+  };
 
   <template>
     <div {{did-update this.updateDisplayName @user}}>
@@ -1266,15 +1261,13 @@ For DOM side effects, element setup, or cleanup, use custom modifiers:
 ```glimmer-js
 // app/components/chart.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Chart extends Component {
   chartInstance = null;
 
-  @action
-  setupChart(element) {
+  setupChart = (element) => {
     this.chartInstance = new Chart(element, this.args.config);
-  }
+  };
 
   willDestroy() {
     super.willDestroy();
@@ -1323,15 +1316,13 @@ For complex state management with automatic cleanup, use `ember-resources`:
 // app/components/user-profile.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class UserProfile extends Component {
   @tracked userData = null;
   @tracked loading = true;
   controller = new AbortController();
 
-  @action
-  async loadUser() {
+  loadUser = async () => {
     this.loading = true;
     try {
       const response = await fetch(`/api/users/${this.args.userId}`, {
@@ -1341,7 +1332,7 @@ class UserProfile extends Component {
     } finally {
       this.loading = false;
     }
-  }
+  };
 
   willDestroy() {
     super.willDestroy();
@@ -1456,7 +1447,7 @@ Modern alternatives provide better performance:
 
 ❌ **Don't use `willDestroy()` for cleanup when a modifier would work**
 
-❌ **Don't use `@action` + `did-insert` when a getter would suffice**
+❌ **Don't use a `did-insert` callback when a getter would suffice**
 
 ❌ **Don't manually track changes when `@cached` handles it automatically**
 
@@ -1468,13 +1459,13 @@ Modern Ember provides superior alternatives to legacy lifecycle hooks:
 
 - **DOM Side Effects**: Use custom modifiers with `registerDestructor`
 
-- **Async Data Loading**: Use getPromiseState from warp-drive/reactiveweb
+- **Async Data Loading**: Use getPromiseState from WarpDrive (`@warp-drive/ember`)
 
 - **Better Code**: More testable, composable, and maintainable
 
 **Never use `{{did-insert}}`, `{{will-destroy}}`, or `{{did-update}}` in new code.**
 
-Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
+Reference: [Ember Modifiers](https://github.com/ember-modifier/ember-modifier), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState), [Glimmer Tracking](https://guides.emberjs.com/release/in-depth-topics/autotracking-in-depth/)
 
 ### 3.4 Avoid Unnecessary Tracking
 
@@ -1487,7 +1478,6 @@ Only mark properties as `@tracked` if they need to trigger re-renders when chang
 ```javascript
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Form extends Component {
   @tracked firstName = ''; // Used in template ✓
@@ -1495,11 +1485,10 @@ class Form extends Component {
   @tracked _formId = Date.now(); // Internal, never rendered ✗
   @tracked _validationCache = new Map(); // Internal state ✗
 
-  @action
-  validate() {
+  validate = () => {
     this._validationCache.set('firstName', this.firstName.length > 0);
     // Unnecessary re-render triggered
-  }
+  };
 }
 ```
 
@@ -1508,7 +1497,6 @@ class Form extends Component {
 ```javascript
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Form extends Component {
   @tracked firstName = ''; // Rendered in template
@@ -1518,12 +1506,11 @@ class Form extends Component {
   _formId = Date.now(); // Not tracked - internal only
   _validationCache = new Map(); // Not tracked - internal state
 
-  @action
-  validate() {
+  validate = () => {
     this._validationCache.set('firstName', this.firstName.length > 0);
     this.isValid = this._validationCache.get('firstName');
     // Only re-renders when isValid changes
-  }
+  };
 }
 ```
 
@@ -1543,7 +1530,6 @@ Create reactive chains where getters depend on other getters or tracked properti
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class ShoppingCart extends Component {
   @tracked items = [];
@@ -1552,17 +1538,15 @@ class ShoppingCart extends Component {
   @tracked shipping = 0;
   @tracked total = 0;
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items = [...this.items, item];
     this.recalculate();
-  }
+  };
 
-  @action
-  removeItem(index) {
+  removeItem = (index) => {
     this.items = this.items.filter((_, i) => i !== index);
     this.recalculate();
-  }
+  };
 
   recalculate() {
     this.subtotal = this.items.reduce((sum, item) => sum + item.price, 0);
@@ -1587,7 +1571,6 @@ class ShoppingCart extends Component {
 ```glimmer-js
 // app/components/shopping-cart.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 
 class ShoppingCart extends Component {
@@ -1630,17 +1613,15 @@ class ShoppingCart extends Component {
     return this.total - this.discount;
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
     // All getters automatically update!
-  }
+  };
 
-  @action
-  removeItem(index) {
+  removeItem = (index) => {
     this.items.splice(index, 1);
     // All getters automatically update!
-  }
+  };
 
   <template>
     <div class="cart">
@@ -2511,13 +2492,11 @@ Use the `{{on}}` modifier for event handling instead of traditional action handl
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     this.args.onClick?.();
-  }
+  };
 
   <template>
     <button onclick={{this.handleClick}}>
@@ -2719,7 +2698,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { service } from '@ember/service';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class DataManager extends Component {
   // Service injection as class fields
@@ -2740,9 +2719,9 @@ class DataManager extends Component {
   }
 
   <template>
-    {{#if this.currentUser.isFulfilled}}
+    {{#if this.currentUser.isSuccess}}
       <div>{{this.currentUser.value.name}}</div>
-    {{else if this.currentUser.isRejected}}
+    {{else if this.currentUser.isError}}
       <div>Error: {{this.currentUser.error.message}}</div>
     {{/if}}
   </template>
@@ -3182,21 +3161,18 @@ import DataTable from './data-table';
 // app/components/dropdown.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 import { hash } from '@ember/helper';
 
 class Dropdown extends Component {
   @tracked isOpen = false;
 
-  @action
-  toggle() {
+  toggle = () => {
     this.isOpen = !this.isOpen;
-  }
+  };
 
-  @action
-  close() {
+  close = () => {
     this.isOpen = false;
-  }
+  };
 
   <template>{{yield (hash isOpen=this.isOpen toggle=this.toggle close=this.close)}}</template>
 }
@@ -4467,28 +4443,24 @@ export default modifier((element, [selector = 'button']) => {
 // app/components/dropdown.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 import { fn } from '@ember/helper';
 import focusFirst from '../modifiers/focus-first';
 
 class Dropdown extends Component {
   @tracked isOpen = false;
 
-  @action
-  toggleMenu() {
+  toggleMenu = () => {
     this.isOpen = !this.isOpen;
-  }
+  };
 
-  @action
-  handleButtonKeyDown(event) {
+  handleButtonKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault();
       this.isOpen = true;
     }
-  }
+  };
 
-  @action
-  handleMenuKeyDown(event) {
+  handleMenuKeyDown = (event) => {
     if (event.key === 'Escape') {
       this.isOpen = false;
       // Return focus to button
@@ -4499,7 +4471,7 @@ class Dropdown extends Component {
       event.preventDefault();
       this.moveFocus(event.key === 'ArrowDown' ? 1 : -1);
     }
-  }
+  };
 
   moveFocus(direction) {
     const items = Array.from(document.querySelectorAll('[role="menuitem"] button'));
@@ -4508,11 +4480,10 @@ class Dropdown extends Component {
     items[nextIndex]?.focus();
   }
 
-  @action
-  selectOption(value) {
+  selectOption = (value) => {
     this.args.onSelect?.(value);
     this.isOpen = false;
-  }
+  };
 
   <template>
     <div class="dropdown">
@@ -4644,23 +4615,20 @@ import { LinkTo } from '@ember/routing';
 ```glimmer-js
 // app/components/custom-button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import XIcon from './x-icon';
 
 class CustomButton extends Component {
-  @action
-  handleKeyDown(event) {
+  handleKeyDown = (event) => {
     // Support Enter and Space keys for keyboard users
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.handleClick();
     }
-  }
+  };
 
-  @action
-  handleClick() {
+  handleClick = () => {
     this.args.onClick?.();
-  }
+  };
 
   <template>
     <div
@@ -5443,7 +5411,6 @@ export class AnalyticsTracker extends Component {
 // app/components/shopping-cart/service.js
 import Service from '@ember/service';
 import { trackedArray } from '@ember/reactive/collections';
-import { action } from '@ember/object';
 
 export class CartService extends Service {
   items = trackedArray([]);
@@ -5452,21 +5419,18 @@ export class CartService extends Service {
     return this.items.reduce((sum, item) => sum + item.price, 0);
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
-  }
+  };
 
-  @action
-  removeItem(id) {
+  removeItem = (id) => {
     const index = this.items.findIndex((item) => item.id === id);
     if (index > -1) this.items.splice(index, 1);
-  }
+  };
 
-  @action
-  clear() {
+  clear = () => {
     this.items.clear();
-  }
+  };
 }
 ```
 
@@ -5508,7 +5472,6 @@ class ShoppingCart extends Component {
 
 ```javascript
 // app/utils/notification-manager.js
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 import { setOwner } from '@ember/application';
 
@@ -5519,8 +5482,7 @@ export class NotificationManager {
     setOwner(this, owner);
   }
 
-  @action
-  add(message, type = 'info') {
+  add = (message, type = 'info') => {
     const notification = {
       id: Math.random().toString(36),
       message,
@@ -5532,13 +5494,12 @@ export class NotificationManager {
 
     // Auto-dismiss after 5 seconds
     setTimeout(() => this.dismiss(notification.id), 5000);
-  }
+  };
 
-  @action
-  dismiss(id) {
+  dismiss = (id) => {
     const index = this.notifications.findIndex((n) => n.id === id);
     if (index > -1) this.notifications.splice(index, 1);
-  }
+  };
 }
 ```
 
@@ -5807,21 +5768,18 @@ export default class DashboardRoute extends Route {
 // app/services/theme.js
 import Service from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class ThemeService extends Service {
   @tracked currentTheme = 'dark';
 
-  @action
-  setTheme(theme) {
+  setTheme = (theme) => {
     this.currentTheme = theme;
     localStorage.setItem('theme', theme);
-  }
+  };
 
-  @action
-  loadTheme() {
+  loadTheme = () => {
     this.currentTheme = localStorage.getItem('theme') || 'dark';
-  }
+  };
 }
 ```
 
@@ -5859,7 +5817,6 @@ import Service from '@ember/service';
 import { service } from '@ember/service';
 import { trackedArray } from '@ember/reactive/collections';
 import { cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class CartService extends Service {
   @service store;
@@ -5876,18 +5833,16 @@ export default class CartService extends Service {
     return this.items.length;
   }
 
-  @action
-  addItem(item) {
+  addItem = (item) => {
     this.items.push(item);
-  }
+  };
 
-  @action
-  removeItem(item) {
+  removeItem = (item) => {
     const index = this.items.indexOf(item);
     if (index > -1) {
       this.items.splice(index, 1);
     }
-  }
+  };
 }
 ```
 
@@ -6427,18 +6382,19 @@ import { formatCurrency } from '../utils/format-currency';
 
 ```javascript
 // app/utils/format-relative-time.js
-export class FormatRelativeTime {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(date) {
+export class FormatRelativeTime extends Helper {
+  @service intl;
+
+  compute([date]) {
     return this.intl.formatRelative(date);
   }
 }
 ```
 
-When you need dependency injection, use a class instead of `helper()`:
+When you need services, extend `Helper` instead of using `helper()`:
 
 **Why Avoid helper():**
 
@@ -7171,13 +7127,11 @@ The `{{fn}}` helper is used for partial application (binding arguments), similar
 ```glimmer-js
 // app/components/search.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Search extends Component {
-  @action
-  handleSearch(event) {
+  handleSearch = (event) => {
     console.log('Searching:', event.target.value);
-  }
+  };
 
   <template>
     {{! Wrong - no arguments being bound}}
@@ -7191,13 +7145,11 @@ class Search extends Component {
 ```glimmer-js
 // app/components/search.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class Search extends Component {
-  @action
-  handleSearch(event) {
+  handleSearch = (event) => {
     console.log('Searching:', event.target.value);
-  }
+  };
 
   <template>
     {{! Correct - pass function directly}}
@@ -7211,14 +7163,12 @@ class Search extends Component {
 ```glimmer-js
 // app/components/user-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class UserList extends Component {
-  @action
-  deleteUser(userId, event) {
+  deleteUser = (userId, event) => {
     console.log('Deleting user:', userId);
     this.args.onDelete(userId);
-  }
+  };
 
   <template>
     <ul>
@@ -7243,14 +7193,12 @@ Use `{{fn}}` when you need to pre-bind arguments to a function, similar to JavaS
 ```glimmer-js
 // app/components/data-grid.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 class DataGrid extends Component {
-  @action
-  updateCell(rowId, columnKey, event) {
+  updateCell = (rowId, columnKey, event) => {
     const newValue = event.target.value;
     this.args.onUpdate(rowId, columnKey, newValue);
-  }
+  };
 
   <template>
     {{#each @rows as |row|}}
@@ -7665,13 +7613,11 @@ Always use the `{{on}}` modifier for event handling instead of HTML event handle
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 
 export default class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     console.log('clicked');
-  }
+  };
 
   <template>
     <button onclick={{this.handleClick}}>
@@ -7686,14 +7632,12 @@ export default class Button extends Component {
 ```glimmer-js
 // app/components/button.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Button extends Component {
-  @action
-  handleClick() {
+  handleClick = () => {
     console.log('clicked');
-  }
+  };
 
   <template>
     <button {{on "click" this.handleClick}}>
@@ -7706,14 +7650,12 @@ export default class Button extends Component {
 ```glimmer-js
 // app/components/scrollable.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Scrollable extends Component {
-  @action
-  handleScroll(event) {
+  handleScroll = (event) => {
     console.log('scrolled', event.target.scrollTop);
-  }
+  };
 
   <template>
     {{! passive: true improves scroll performance }}
@@ -7731,24 +7673,20 @@ The `{{on}}` modifier supports standard event listener options:
 ```glimmer-js
 // app/components/input-field.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class InputField extends Component {
-  @action
-  handleFocus() {
+  handleFocus = () => {
     console.log('focused');
-  }
+  };
 
-  @action
-  handleBlur() {
+  handleBlur = () => {
     console.log('blurred');
-  }
+  };
 
-  @action
-  handleInput(event) {
+  handleInput = (event) => {
     this.args.onChange?.(event.target.value);
-  }
+  };
 
   <template>
     <input
@@ -7765,17 +7703,15 @@ export default class InputField extends Component {
 ```glimmer-js
 // app/components/form.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class Form extends Component {
-  @action
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault(); // Prevent page reload
     event.stopPropagation(); // Stop event bubbling if needed
 
     this.args.onSubmit?.(/* form data */);
-  }
+  };
 
   <template>
     <form {{on "submit" this.handleSubmit}}>
@@ -7788,12 +7724,10 @@ export default class Form extends Component {
 ```glimmer-js
 // app/components/keyboard-nav.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class KeyboardNav extends Component {
-  @action
-  handleKeyDown(event) {
+  handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.args.onActivate?.();
@@ -7802,7 +7736,7 @@ export default class KeyboardNav extends Component {
     if (event.key === 'Escape') {
       this.args.onCancel?.();
     }
-  }
+  };
 
   <template>
     <div role="button" tabindex="0" {{on "keydown" this.handleKeyDown}}>
@@ -7815,18 +7749,16 @@ export default class KeyboardNav extends Component {
 ```glimmer-js
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { on } from '@ember/modifier';
 
 export default class TodoList extends Component {
-  @action
-  handleClick(event) {
+  handleClick = (event) => {
     // Find which todo was clicked
     const todoId = event.target.closest('[data-todo-id]')?.dataset.todoId;
     if (todoId) {
       this.args.onTodoClick?.(todoId);
     }
-  }
+  };
 
   <template>
     {{! Single listener for all todos - better than one per item }}
@@ -7851,20 +7783,22 @@ Handle these in your action, not in the template:
 
 For lists with many items, use event delegation on the parent:
 
-**❌ Don't bind directly without @action:**
+**❌ Don't pass a plain method:**
 
 ```glimmer-js
-// This won't work - loses 'this' context
+myMethod() {
+  // 'this' is undefined when the click calls it
+}
+
 <button {{on "click" this.myMethod}}>Bad</button>
 ```
 
-**✅ Use @action decorator:**
+**✅ Use an arrow function:**
 
 ```glimmer-js
-@action
-myMethod() {
+myMethod = () => {
   // 'this' is correctly bound
-}
+};
 
 <button {{on "click" this.myMethod}}>Good</button>
 ```
@@ -10004,13 +9938,13 @@ class UserProfile extends Component {
 
 - Can trigger multiple re-renders
 
-**Correct: use getPromiseState from warp-drive/reactiveweb for data loading**
+**Correct: use getPromiseState from WarpDrive for data loading**
 
 ```glimmer-js
 // app/components/user-profile.gjs
 import Component from '@glimmer/component';
 import { cached } from '@glimmer/tracking';
-import { getPromiseState } from '@warp-drive/reactiveweb';
+import { getPromiseState } from '@warp-drive/ember';
 
 class UserProfile extends Component {
   @cached
@@ -10022,9 +9956,9 @@ class UserProfile extends Component {
   <template>
     {{#if this.userData.isPending}}
       <div>Loading...</div>
-    {{else if this.userData.isRejected}}
+    {{else if this.userData.isError}}
       <div>Error: {{this.userData.error.message}}</div>
-    {{else if this.userData.isFulfilled}}
+    {{else if this.userData.isSuccess}}
       <h1>{{this.userData.value.name}}</h1>
     {{/if}}
   </template>
@@ -10145,7 +10079,7 @@ class FormSubmit extends Component {
 
 - **User-initiated only** - ember-concurrency is for handling user concurrency patterns
 
-- **Data loading** - Use `getPromiseState` from warp-drive/reactiveweb for non-user-initiated loading
+- **Data loading** - Use `getPromiseState` from WarpDrive (`@warp-drive/ember`) for non-user-initiated loading
 
 - **Avoid side effects** - Don't modify component state inside tasks that's read during render
 
@@ -10198,13 +10132,13 @@ class Better extends Component {
     return getPromiseState(fetch('/api/data').then((r) => r.json()));
   }
 
-  // template reads: {{#if this.data.isFulfilled}}{{this.data.value}}{{/if}}
+  // template reads: {{#if this.data.isSuccess}}{{this.data.value}}{{/if}}
 }
 ```
 
 ember-concurrency is a powerful tool for **user concurrency patterns**. For data loading, use `getPromiseState` instead.
 
-Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [warp-drive/reactiveweb](https://github.com/emberjs/data/tree/main/packages/reactiveweb)
+Reference: [TaskInstance API](https://ember-concurrency.com/api/TaskInstance.html), [Task API](https://ember-concurrency.com/api/Task.html), [ember-concurrency](https://ember-concurrency.com/), [WarpDrive: getPromiseState](https://warp-drive.io/api/@warp-drive/core/reactive/functions/getPromiseState)
 
 ### 10.3 Use Ember Concurrency for User Input Concurrency
 
@@ -10218,7 +10152,6 @@ Use ember-concurrency for managing **user-initiated** async operations like sear
 // app/components/search.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Search extends Component {
   @tracked results = [];
@@ -10226,8 +10159,7 @@ class Search extends Component {
   @tracked error = null;
   currentRequest = null;
 
-  @action
-  async search(event) {
+  search = async (event) => {
     const query = event.target.value;
 
     // Manual cancelation - easy to get wrong
@@ -10253,7 +10185,7 @@ class Search extends Component {
     } finally {
       this.isSearching = false;
     }
-  }
+  };
 
   <template>
     <input {{on "input" this.search}} />
@@ -10531,16 +10463,17 @@ For truly shared helpers used across the whole app, use `app/utils/`:
 
 **Note**: Keep utils flat (`app/utils/format-relative-date.js`), not nested (`app/utils/date/format-relative-date.js`). If you need cleaner top-level imports, configure subpath-imports in package.json instead of nesting files.
 
-**For helpers with state, use class-based helpers:**
+**For helpers that need services, extend `Helper`:**
 
 ```javascript
-// app/utils/helpers/format-currency.js
-export class FormatCurrencyHelper {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+// app/utils/format-currency.js
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(amount, { currency = 'USD' } = {}) {
+export class FormatCurrencyHelper extends Helper {
+  @service intl;
+
+  compute([amount], { currency = 'USD' }) {
     return this.intl.formatNumber(amount, {
       style: 'currency',
       currency,
@@ -10548,6 +10481,8 @@ export class FormatCurrencyHelper {
   }
 }
 ```
+
+A class-based helper's `compute` receives the positional arguments as an array and the named arguments as an object.
 
 **Common helpers to create:**
 
@@ -10717,23 +10652,20 @@ Use Ember's built-in reactive collections from `@ember/reactive/collections`.
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 export default class TodoList extends Component {
   @tracked todos = []; // ❌ Array mutations (push, splice, etc.) won't trigger updates
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // This won't trigger a re-render!
     this.todos.push({ id: Date.now(), text });
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // This also won't trigger a re-render!
     const index = this.todos.findIndex((t) => t.id === id);
     this.todos.splice(index, 1);
-  }
+  };
 
   <template>
     <ul>
@@ -10754,24 +10686,21 @@ export default class TodoList extends Component {
 ```glimmer-js
 // app/components/todo-list.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedArray } from '@ember/reactive/collections';
 
 export default class TodoList extends Component {
   todos = trackedArray([]); // ✅ Mutations are reactive
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // Now this triggers re-render!
     this.todos.push({ id: Date.now(), text });
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // This also triggers re-render!
     const index = this.todos.findIndex((t) => t.id === id);
     this.todos.splice(index, 1);
-  }
+  };
 
   <template>
     <ul>
@@ -10790,21 +10719,18 @@ export default class TodoList extends Component {
 ```glimmer-js
 // app/components/user-cache.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedMap } from '@ember/reactive/collections';
 
 export default class UserCache extends Component {
   userCache = trackedMap(); // key: userId, value: userData
 
-  @action
-  cacheUser(userId, userData) {
+  cacheUser = (userId, userData) => {
     this.userCache.set(userId, userData);
-  }
+  };
 
-  @action
-  clearUser(userId) {
+  clearUser = (userId) => {
     this.userCache.delete(userId);
-  }
+  };
 
   get cachedUsers() {
     return Array.from(this.userCache.values());
@@ -10824,20 +10750,18 @@ export default class UserCache extends Component {
 ```glimmer-js
 // app/components/tag-selector.gjs
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { trackedSet } from '@ember/reactive/collections';
 
 export default class TagSelector extends Component {
   selectedTags = trackedSet();
 
-  @action
-  toggleTag(tag) {
+  toggleTag = (tag) => {
     if (this.selectedTags.has(tag)) {
       this.selectedTags.delete(tag);
     } else {
       this.selectedTags.add(tag);
     }
-  }
+  };
 
   get selectedCount() {
     return this.selectedTags.size;
@@ -10928,17 +10852,15 @@ import { tracked } from '@glimmer/tracking';
 export default class TodoList extends Component {
   @tracked todos = [];
 
-  @action
-  addTodo(text) {
+  addTodo = (text) => {
     // Reassignment is reactive
     this.todos = [...this.todos, { id: Date.now(), text }];
-  }
+  };
 
-  @action
-  removeTodo(id) {
+  removeTodo = (id) => {
     // Reassignment is reactive
     this.todos = this.todos.filter((t) => t.id !== id);
-  }
+  };
 }
 ```
 

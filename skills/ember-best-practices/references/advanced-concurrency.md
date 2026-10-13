@@ -15,7 +15,6 @@ Use ember-concurrency for managing **user-initiated** async operations like sear
 // app/components/search.gjs
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Search extends Component {
   @tracked results = [];
@@ -23,8 +22,7 @@ class Search extends Component {
   @tracked error = null;
   currentRequest = null;
 
-  @action
-  async search(event) {
+  search = async (event) => {
     const query = event.target.value;
 
     // Manual cancelation - easy to get wrong
@@ -50,7 +48,7 @@ class Search extends Component {
     } finally {
       this.isSearching = false;
     }
-  }
+  };
 
   <template>
     <input {{on "input" this.search}} />

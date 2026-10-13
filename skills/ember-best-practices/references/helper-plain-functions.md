@@ -70,16 +70,17 @@ import { formatCurrency } from '../utils/format-currency';
 
 **For Helpers that Need Services (use class-based):**
 
-When you need dependency injection, use a class instead of `helper()`:
+When you need services, extend `Helper` instead of using `helper()`:
 
 ```javascript
 // app/utils/format-relative-time.js
-export class FormatRelativeTime {
-  constructor(owner) {
-    this.intl = owner.lookup('service:intl');
-  }
+import Helper from '@ember/component/helper';
+import { service } from '@ember/service';
 
-  compute(date) {
+export class FormatRelativeTime extends Helper {
+  @service intl;
+
+  compute([date]) {
     return this.intl.formatRelative(date);
   }
 }

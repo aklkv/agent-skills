@@ -14,7 +14,6 @@ Only mark properties as `@tracked` if they need to trigger re-renders when chang
 ```javascript
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Form extends Component {
   @tracked firstName = ''; // Used in template ✓
@@ -22,11 +21,10 @@ class Form extends Component {
   @tracked _formId = Date.now(); // Internal, never rendered ✗
   @tracked _validationCache = new Map(); // Internal state ✗
 
-  @action
-  validate() {
+  validate = () => {
     this._validationCache.set('firstName', this.firstName.length > 0);
     // Unnecessary re-render triggered
-  }
+  };
 }
 ```
 
@@ -35,7 +33,6 @@ class Form extends Component {
 ```javascript
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 
 class Form extends Component {
   @tracked firstName = ''; // Rendered in template
@@ -45,12 +42,11 @@ class Form extends Component {
   _formId = Date.now(); // Not tracked - internal only
   _validationCache = new Map(); // Not tracked - internal state
 
-  @action
-  validate() {
+  validate = () => {
     this._validationCache.set('firstName', this.firstName.length > 0);
     this.isValid = this._validationCache.get('firstName');
     // Only re-renders when isValid changes
-  }
+  };
 }
 ```
 

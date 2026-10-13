@@ -58,7 +58,7 @@ Reference these guidelines when:
 - [component-use-glimmer](references/component-use-glimmer.md) - Use Glimmer components over classic components
 - [component-cached-getters](references/component-cached-getters.md) - Use @cached for expensive computations
 - [component-minimal-tracking](references/component-minimal-tracking.md) - Only track properties that affect rendering
-- [component-tracked-toolbox](references/component-tracked-toolbox.md) - Use tracked-built-ins for complex state
+- [component-tracked-toolbox](references/component-tracked-toolbox.md) - Use tracked collections for complex state
 - [component-composition-patterns](references/component-composition-patterns.md) - Use yield blocks and contextual components
 - [component-reactive-chains](references/component-reactive-chains.md) - Build reactive chains with dependent getters
 - [component-class-fields](references/component-class-fields.md) - Use class fields for component composition
