@@ -9,7 +9,7 @@ metadata:
 
 # Ember.js Best Practices
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 59 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 60 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -62,6 +62,7 @@ Reference these guidelines when:
 - [component-composition-patterns](references/component-composition-patterns.md) - Use yield blocks and contextual components
 - [component-reactive-chains](references/component-reactive-chains.md) - Build reactive chains with dependent getters
 - [component-class-fields](references/component-class-fields.md) - Use class fields for component composition
+- [component-standalone-tracked](references/component-standalone-tracked.md) - Keep app state on classes, not in standalone tracked() values
 - [component-controlled-forms](references/component-controlled-forms.md) - Implement controlled form patterns
 - [component-on-modifier](references/component-on-modifier.md) - Use {{on}} modifier for event handling
 - [component-args-validation](references/component-args-validation.md) - Validate component arguments

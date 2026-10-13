@@ -553,6 +553,30 @@
   },
   {
     "ruleId": "",
+    "ruleTitle": "Keep App State on Classes, Not in Standalone tracked() Values",
+    "type": "bad",
+    "code": "// app/components/counter.gjs\nimport { tracked } from '@glimmer/tracking';\n\nconst count = tracked(0);\nconst increment = () => count.value++;\n\nexport const Counter = <template>\n  <button type=\"button\" {{on \"click\" increment}}>{{count.value}}</button>\n</template>;",
+    "language": "glimmer-js",
+    "description": "a template-only component keeps its state in module scope"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Keep App State on Classes, Not in Standalone tracked() Values",
+    "type": "good",
+    "code": "// app/components/counter.gjs\nimport Component from '@glimmer/component';\nimport { tracked } from '@glimmer/tracking';\n\nexport class Counter extends Component {\n  @tracked count = 0;\n\n  increment = () => this.count++;\n\n  <template>\n    <button type=\"button\" {{on \"click\" this.increment}}>{{this.count}}</button>\n  </template>\n}",
+    "language": "glimmer-js",
+    "description": "component state in a `@tracked` field"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Keep App State on Classes, Not in Standalone tracked() Values",
+    "type": "good",
+    "code": "// tests/integration/components/name-tag-test.gjs\nimport { module, test } from 'qunit';\nimport { setupRenderingTest } from 'ember-qunit';\nimport { render, settled } from '@ember/test-helpers';\nimport { tracked } from '@glimmer/tracking';\nimport { NameTag } from 'my-app/components/name-tag';\n\nmodule('Integration | Component | name-tag', function (hooks) {\n  setupRenderingTest(hooks);\n\n  test('it shows the new name', async function (assert) {\n    const name = tracked('Ada');\n\n    await render(<template><NameTag @name={{name.value}} data-test-name-tag /></template>);\n    name.value = 'Grace';\n    await settled();\n\n    assert.dom('[data-test-name-tag]').includesText('Grace');\n  });\n});",
+    "language": "glimmer-js",
+    "description": "a tracked value for a test's state"
+  },
+  {
+    "ruleId": "",
     "ruleTitle": "Use Strict Mode and Template-Only Components",
     "type": "bad",
     "code": "// app/components/user-card.gjs\nimport Component from '@glimmer/component';\n\nclass UserCard extends Component {\n  <template>\n    <div class=\"user-card\">\n      <h3>{{@user.name}}</h3>\n      <p>{{@user.email}}</p>\n    </div>\n  </template>\n}",
