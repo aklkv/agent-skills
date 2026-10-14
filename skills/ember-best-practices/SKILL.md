@@ -9,7 +9,7 @@ metadata:
 
 # Ember.js Best Practices
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications. Contains 60 rules across 10 categories, prioritized by impact to guide automated refactoring and code generation.
+Comprehensive performance optimization and accessibility guide for Ember.js applications. Its rules span 10 categories, prioritized by impact to guide automated refactoring and code generation.
 
 ## When to Apply
 
@@ -58,6 +58,7 @@ Reference these guidelines when:
 - [component-use-glimmer](references/component-use-glimmer.md) - Use Glimmer components over classic components
 - [component-cached-getters](references/component-cached-getters.md) - Use @cached for expensive computations
 - [component-minimal-tracking](references/component-minimal-tracking.md) - Only track properties that affect rendering
+- [component-no-tracked-writes-in-render](references/component-no-tracked-writes-in-render.md) - Don't update tracked state while rendering
 - [component-tracked-toolbox](references/component-tracked-toolbox.md) - Use tracked collections for complex state
 - [component-composition-patterns](references/component-composition-patterns.md) - Use yield blocks and contextual components
 - [component-reactive-chains](references/component-reactive-chains.md) - Build reactive chains with dependent getters

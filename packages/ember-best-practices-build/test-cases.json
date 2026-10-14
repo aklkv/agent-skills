@@ -481,6 +481,22 @@
   },
   {
     "ruleId": "",
+    "ruleTitle": "Don't Update Tracked State While Rendering",
+    "type": "bad",
+    "code": "// app/components/leaderboard.gjs\nimport Component from '@glimmer/component';\nimport { tracked } from '@glimmer/tracking';\n\nexport class Leaderboard extends Component {\n  @tracked sortedCache;\n\n  get sorted() {\n    this.sortedCache ??= [...this.args.players].sort((a, b) => b.score - a.score);\n    return this.sortedCache;\n  }\n\n  <template>\n    {{#each this.sorted as |player|}}\n      <p>{{player.name}}: {{player.score}}</p>\n    {{/each}}\n  </template>\n}",
+    "language": "glimmer-js",
+    "description": "a getter fills a tracked cache"
+  },
+  {
+    "ruleId": "",
+    "ruleTitle": "Don't Update Tracked State While Rendering",
+    "type": "good",
+    "code": "// app/components/leaderboard.gjs\nimport Component from '@glimmer/component';\nimport { cached } from '@glimmer/tracking';\n\nexport class Leaderboard extends Component {\n  // Memoized, and recomputed when @players changes\n  @cached\n  get sorted() {\n    return [...this.args.players].sort((a, b) => b.score - a.score);\n  }\n\n  <template>\n    {{#each this.sorted as |player|}}\n      <p>{{player.name}}: {{player.score}}</p>\n    {{/each}}\n  </template>\n}",
+    "language": "glimmer-js",
+    "description": "derive the value with `@cached`"
+  },
+  {
+    "ruleId": "",
     "ruleTitle": "Use {{on}} Modifier for Event Handling",
     "type": "bad",
     "code": "// app/components/button.gjs\nimport Component from '@glimmer/component';\n\nclass Button extends Component {\n  handleClick = () => {\n    this.args.onClick?.();\n  };\n\n  <template>\n    <button onclick={{this.handleClick}}>\n      {{@label}}\n    </button>\n  </template>\n}",
