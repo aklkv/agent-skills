@@ -14,7 +14,7 @@ January 2026
 
 ## Abstract
 
-Comprehensive performance optimization and accessibility guide for Ember.js applications, designed for AI agents and LLMs. Contains 42 rules across 7 categories, prioritized by impact from critical (route loading optimization, build performance) to advanced patterns (Resources, ember-concurrency, modern testing, composition patterns, owner/linkage management). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation. Uses WarpDrive for modern data management, includes accessibility best practices leveraging ember-a11y-testing and other OSS tools, and comprehensive coverage of reactive composition, data derivation, controlled forms, conditional rendering, data requesting patterns, built-in helpers, and service architecture patterns.
+Comprehensive performance optimization and accessibility guide for Ember.js applications, designed for AI agents and LLMs. Its rules span 10 categories, prioritized by impact from critical (route loading optimization, build performance) to advanced patterns (Resources, ember-concurrency, modern testing, composition patterns, owner/linkage management). Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation. Uses WarpDrive for modern data management, includes accessibility best practices leveraging ember-a11y-testing and other OSS tools, and comprehensive coverage of reactive composition, data derivation, controlled forms, conditional rendering, data requesting patterns, built-in helpers, and service architecture patterns.
 
 ---
 
