@@ -1,11 +1,11 @@
 ---
-title: Spread ...attributes on the Element Callers Mean, and Mind Its Position
+title: Spread ...attributes on the Right Element, in the Right Position
 impact: MEDIUM
 impactDescription: Callers' attributes and modifiers reach the right element, and none are silently dropped
 tags: components, attributes, splattributes, forms, accessibility
 ---
 
-## Spread ...attributes on the Element Callers Mean, and Mind Its Position
+## Spread ...attributes on the Right Element, in the Right Position
 
 **Impact: MEDIUM (callers' attributes and modifiers reach the right element, and none are silently dropped)**
 

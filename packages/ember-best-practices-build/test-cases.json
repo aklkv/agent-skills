@@ -585,7 +585,7 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Spread ...attributes on the Element Callers Mean, and Mind Its Position",
+    "ruleTitle": "Spread ...attributes on the Right Element, in the Right Position",
     "type": "bad",
     "code": "// app/components/text-field.gjs\nimport Component from '@glimmer/component';\nimport { guidFor } from '@ember/object/internals';\n\nexport class TextField extends Component {\n  id = guidFor(this);\n\n  <template>\n    <div class=\"text-field\" ...attributes>\n      <label for={{this.id}}>{{@label}}</label>\n      <input id={{this.id}} value={{@value}} />\n    </div>\n  </template>\n}",
     "language": "glimmer-js",
@@ -593,7 +593,7 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Spread ...attributes on the Element Callers Mean, and Mind Its Position",
+    "ruleTitle": "Spread ...attributes on the Right Element, in the Right Position",
     "type": "bad",
     "code": "<input ...attributes id={{this.id}} aria-describedby={{if @hint this.hintId}} value={{@value}} />",
     "language": "handlebars",
@@ -601,7 +601,7 @@
   },
   {
     "ruleId": "",
-    "ruleTitle": "Spread ...attributes on the Element Callers Mean, and Mind Its Position",
+    "ruleTitle": "Spread ...attributes on the Right Element, in the Right Position",
     "type": "good",
     "code": "// app/components/text-field.gjs\nimport Component from '@glimmer/component';\nimport { guidFor } from '@ember/object/internals';\n\nexport class TextField extends Component {\n  id = guidFor(this);\n  hintId = `${this.id}-hint`;\n\n  <template>\n    <div class=\"text-field {{@wrapperClass}}\">\n      <label for={{this.id}}>{{@label}}</label>\n      <input\n        aria-describedby={{if @hint this.hintId}}\n        ...attributes\n        id={{this.id}}\n        value={{@value}}\n      />\n      {{#if @hint}}\n        <p id={{this.hintId}}>{{@hint}}</p>\n      {{/if}}\n    </div>\n  </template>\n}",
     "language": "glimmer-js",

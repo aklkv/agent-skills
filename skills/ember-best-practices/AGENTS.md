@@ -41,7 +41,7 @@ Comprehensive performance optimization and accessibility guide for Ember.js appl
    - 3.8 [Keep App State on Classes, Not in Standalone tracked() Values](#38-keep-app-state-on-classes-not-in-standalone-tracked-values)
    - 3.9 [Prefer Named Exports, Fallback to Default for Implicit Template Lookup](#39-prefer-named-exports-fallback-to-default-for-implicit-template-lookup)
    - 3.10 [Prevent Memory Leaks in Components](#310-prevent-memory-leaks-in-components)
-   - 3.11 [Spread ...attributes on the Element Callers Mean, and Mind Its Position](#311-spread-attributes-on-the-element-callers-mean-and-mind-its-position)
+   - 3.11 [Spread ...attributes on the Right Element, in the Right Position](#311-spread-attributes-on-the-right-element-in-the-right-position)
    - 3.12 [Use {{on}} Modifier for Event Handling](#312-use-on-modifier-for-event-handling)
    - 3.13 [Use @cached for Expensive Getters](#313-use-cached-for-expensive-getters)
    - 3.14 [Use Class Fields for Component Composition](#314-use-class-fields-for-component-composition)
@@ -2546,7 +2546,7 @@ Always clean up timers, event listeners, subscriptions, and pending requests to 
 
 Reference: [Ember Destroyable](https://api.emberjs.com/ember/release/modules/@ember%2Fdestroyable)
 
-### 3.11 Spread ...attributes on the Element Callers Mean, and Mind Its Position
+### 3.11 Spread ...attributes on the Right Element, in the Right Position
 
 **Impact: MEDIUM (Callers' attributes and modifiers reach the right element, and none are silently dropped)**
 
